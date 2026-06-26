@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>连接 MySQL 数据库</title>
+</head>
+
+<body>
+    <h1>数据库数据：</h1>
+    <div id="data1"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/getJSON', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    console.log(data);
+
+                }
+            };
+            xhr.send();
+        });
+
+        function displayData(data) {
+            var dataDiv = document.getElementById('data1');
+            dataDiv.innerHTML = "<ul>";
+           dataDiv.innerHTML += "<li>" + data + "</li>";
+
+            dataDiv.innerHTML += "</ul>";
+        }
+    </script>
+</body>
+
+</html>

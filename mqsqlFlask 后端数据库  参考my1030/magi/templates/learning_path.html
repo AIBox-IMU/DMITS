@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习路径推荐</title>
+    <link href="<< url_for('static', filename='CSS/global/intelligence-center.css') >>" rel="stylesheet">
+    <link href="<< url_for('static', filename='CSS/global/site-navigation.css') >>" rel="stylesheet">
+</head>
+
+<body class="ai-page has-site-dock">
+    <div class="ai-shell" id="path-page-root">
+        <header class="ai-topbar">
+            <a class="ai-brand" href="<< url_for('INDEX') >>">
+                <span class="ai-brand-mark">AI</span>
+                <span class="ai-brand-copy">
+                    <span class="ai-brand-kicker">Math System</span>
+                    <span class="ai-brand-title">学习路径推荐</span>
+                </span>
+            </a>
+            <div class="ai-topbar-side">
+                <span class="ai-badge is-accent">当前推荐路径视图</span>
+            </div>
+        </header>
+
+        <main class="ai-main">
+            <section class="ai-hero">
+                <div class="ai-hero-copy">
+                    <div class="ai-hero-kicker">Learning Path Navigator</div>
+                    <h1 class="ai-hero-title">把当前推荐学习路径单独展开展示，让每一步为什么学、先学什么、后学什么都更清楚</h1>
+                    <div class="ai-hero-tags" id="path-student-meta"></div>
+                    <div class="ai-note-box">
+                        <strong id="path-student-name">示例学生</strong>
+                        把推荐模型输出映射成一条独立的学习路径视图，后续接入真实推荐结果后即可直接展示。
+                    </div>
+                    <div class="ai-focus-strip" id="path-focus-strip"></div>
+                </div>
+                <div class="ai-hero-side">
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">当前聚焦目标</span>
+                        <span class="ai-metric-value" id="path-focus-target">--</span>
+                        <span class="ai-metric-footnote">模型或规则挑选出的当前重点目标</span>
+                    </div>
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">当前掌握度</span>
+                        <span class="ai-metric-value" id="path-current-mastery">--</span>
+                        <span class="ai-metric-footnote">面向当前目标的起点水平</span>
+                    </div>
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">目标掌握度 / 预计增益</span>
+                        <span class="ai-metric-value"><span id="path-target-mastery">--</span> / <span id="path-expected-gain">--</span></span>
+                        <span class="ai-metric-footnote">预计时长 <span id="path-estimated-minutes">--</span></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="path-layout">
+                <article class="ai-card path-graph-panel">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>推荐路径总览</h2>
+                            <p class="ai-section-subtitle">这里只展示当前推荐的学习路径本身，按顺序串联阶段节点，不再叠加整张知识图谱背景。</p>
+                        </div>
+                    </div>
+                    <div class="path-graph-stage">
+                        <div id="learning-path-graph"></div>
+                    </div>
+                    <div class="path-legend">
+                        <span><i class="is-path"></i> 推荐主路径</span>
+                        <span><i class="is-focus"></i> 当前聚焦步骤</span>
+                    </div>
+                </article>
+
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>分步学习任务</h2>
+                            <p class="ai-section-subtitle">点击任一步骤，左侧路径视图会聚焦到对应知识点，帮助教师和学生理解推荐原因。</p>
+                        </div>
+                    </div>
+                    <div class="path-step-list" id="path-steps"></div>
+                    <div class="ai-note-box" id="path-detail-note">
+                        <strong>当前焦点：</strong>可从右侧步骤卡或图谱节点中选择一个阶段，查看推荐说明。
+                    </div>
+                </article>
+            </section>
+
+{#            <section class="ai-grid-two">#}
+{#                <article class="ai-card">#}
+{#                    <div class="ai-section-head">#}
+{#                        <div>#}
+{#                            <h2>阶段编排</h2>#}
+{#                            <p class="ai-section-subtitle">把完整路径拆成“基础澄清 / 重点攻坚 / 迁移应用”三段，方便排课与分阶段推送。</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="path-phase-list" id="path-phases"></div>#}
+{#                </article>#}
+{##}
+{#                <article class="ai-card">#}
+{#                    <div class="ai-section-head">#}
+{#                        <div>#}
+{#                            <h2>可选分支</h2>#}
+{#                            <p class="ai-section-subtitle">适合承接“备选路径”“兴趣扩展”或“同难度替代节点”等推荐结果。</p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="path-alt-list" id="path-alternatives"></div>#}
+{#                </article>#}
+{#            </section>#}
+
+{#            <section class="ai-card">#}
+{#                <div class="ai-section-head">#}
+{#                    <div>#}
+{#                        <h2>接口接入说明</h2>#}
+{#                        <p class="ai-section-subtitle">页面结构已和推荐模型输出形态对齐，后续只需替换接口返回即可。</p>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="ai-note-box" id="path-integration-note"></div>#}
+{#            </section>#}
+        </main>
+
+        {% set dock_class = 'site-page-dock--ai' %}
+        {% include '_site_page_dock.html' %}
+    </div>
+
+    <script src="<< url_for('static', filename='JS/global/g6.min.js') >>"></script>
+    <script src="<< url_for('static', filename='JS/global/intelligence-common.js') >>"></script>
+    <script src="<< url_for('static', filename='JS/global/learning-path.js') >>"></script>
+</body>
+
+</html>

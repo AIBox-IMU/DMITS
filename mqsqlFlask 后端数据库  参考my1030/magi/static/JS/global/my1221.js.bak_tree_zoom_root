@@ -1,0 +1,3832 @@
+let nodes, links,nodeIds;
+$.ajax({
+  url: '/api/graph',
+  dataType: 'json',
+  async: false,
+  success: function(data) {
+    if (data && data.data) {
+      nodes = data.data.nodes;
+      links = data.data.links;
+    } else {
+      nodes = JSON.parse(data.data1);
+      links = JSON.parse(data.data2);
+    }
+
+    console.log("ajax");
+    console.log(nodes);//结点
+    console.log(links);//边
+  },
+  error: function(jqXHR, textStatus, errorThrown) {
+    console.log("errorThrown");
+    console.log(errorThrown);
+  }
+});
+console.log("nodes")
+console.log(nodes)
+nodeIds = nodes.map(node => node.id);
+const adjacencyMatrix = new Array(nodeIds.length + 1).fill(0).map(() => new Array(nodeIds.length + 1).fill(0));
+
+// 在 links 中查找每条边的源节点和目标节点，更新邻接矩阵
+   links.forEach(link => {
+        const sourceIndex = nodeIds.indexOf(link.source) + 1;
+        const targetIndex = nodeIds.indexOf(link.target) + 1;
+        if (sourceIndex !== -1 && targetIndex !== -1) {
+            adjacencyMatrix[sourceIndex][targetIndex] = 1;
+        }
+});
+
+const relationControlMenu = document.querySelector(".relation-control-menu");
+const menuElem = document.querySelector(".menu.control-menu-list");
+relationControlMenu.addEventListener("click", function () {
+    // 在此处执行点击事件的操作
+    if (menuElem.classList.contains("active")) {
+        menuElem.classList.remove("active");
+    } else {
+        menuElem.classList.add("active");
+    }
+});
+
+//无坐标
+
+
+
+
+// 数据（节点和连线）
+// 结点坐标,有坐标
+// const coordinates = [
+//     [500, 200], [500, 300], [400, 300],
+//     [600, 300], [500, 400], [550, 400],
+//     [600, 400], [450, 400], [400, 400],
+//     [500, 500], [475, 500], [450, 500],
+//     [425, 500]]; // 替换成你的坐标数组
+// const nodes = [
+//     { id: 1, name: "Node 1", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 1单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 2, name: "Node 2", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 2单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 3, name: "Node 3", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 3单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 4, name: "Node 4", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 4单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     // { id: 5, name: "Node 5", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 5单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 6, name: "Node 6", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 6单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 7, name: "Node 7", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 7单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 8, name: "Node 8", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 8单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 9, name: "Node 9", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 9单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 10, name: "Node 10", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 10单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 11, name: "Node 11", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 11单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 12, name: "Node 12", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 12单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+//     { id: 13, name: "Node 13", x: 100, y: 100, image: "Y:/VscodeProject/display/dist/images/snow.png", details: "Node 13单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略" },
+// ];
+
+// for (let i = 14; i <= 40; i++) {
+//     const newNode = {
+//         id: "" + i,
+//         name: "Node " + i,
+//         image: "Y:/VscodeProject/display/dist/images/snow.png",
+//         details: "Node " + (nodes.length + i) + "单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略"
+//     };
+
+//     nodes.push(newNode);
+// }
+// for (let i = 0; i < nodes.length; i++) {
+//     nodes[i].x = coordinates[i][0];
+//     nodes[i].y = coordinates[i][1];
+//     let t = i + 1;
+// }
+
+//const nodes = [
+//    { id: 1, name: "Node1", image: "../static/Imgs/snow.png", details: "Node 1单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 2, name: "Node2", image: "../static/Imgs/snow.png", details: "Node 2单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 3, name: "Node3", image: "../static/Imgs/snow.png", details: "Node 3单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 4, name: "Node4", image: "../static/Imgs/snow.png", details: "Node 4单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 5, name: "Node5", image: "../static/Imgs/snow.png", details: "Node 5单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 6, name: "Node6", image: "../static/Imgs/snow.png", details: "Node 6单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 7, name: "Node7", image: "../static/Imgs/snow.png", details: "Node 7单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 8, name: "Node8", image: "../static/Imgs/snow.png", details: "Node 8单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 9, name: "Node9", image: "../static/Imgs/snow.png", details: "Node 9单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 10, name: "Node10", image: "../static/Imgs/snow.png", details: "Node 10单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 11, name: "Node11", image: "../static/Imgs/snow.png", details: "Node 11单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 12, name: "Node12", image: "../static/Imgs/snow.png", details: "Node 12单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 13, name: "Node13", image: "../static/Imgs/snow.png", details: "Node 13单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 14, name: "Node14", image: "../static/Imgs/snow.png", details: "Node 9单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 15, name: "Node15", image: "../static/Imgs/snow.png", details: "Node 10单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 16, name: "Node16", image: "../static/Imgs/snow.png", details: "Node 11单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 17, name: "Node17", image: "../static/Imgs/snow.png", details: "Node 12单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 18, name: "Node18", image: "../static/Imgs/snow.png", details: "Node 9单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 19, name: "Node19", image: "../static/Imgs/snow.png", details: "Node 10单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 20, name: "Node20", image: "../static/Imgs/snow.png", details: "Node 11单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: 21, name: "Node21", image: "../static/Imgs/snow.png", details: "Node 12单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//
+//    { id: 22, name: "Node22", image: "../static/Imgs/snow.png", details: "Node 10单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 23, name: "Node23", image: "../static/Imgs/snow.png", details: "Node 1单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 24, name: "Node24", image: "../static/Imgs/snow.png", details: "Node 2单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 25, name: "Node25", image: "../static/Imgs/snow.png", details: "Node 3单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 26, name: "Node26", image: "../static/Imgs/snow.png", details: "Node 4单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 27, name: "Node27", image: "../static/Imgs/snow.png", details: "Node 5单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 28, name: "Node28", image: "../static/Imgs/snow.png", details: "Node 6单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 29, name: "Node29", image: "../static/Imgs/snow.png", details: "Node 7单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 30, name: "Node30", image: "../static/Imgs/snow.png", details: "Node 8单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 31, name: "Node31", image: "../static/Imgs/snow.png", details: "Node 9单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 32, name: "Node32", image: "../static/Imgs/snow.png", details: "Node 10单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//
+//    { id: 33, name: "Node33", image: "../static/Imgs/snow.png", details: "Node 11单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 34, name: "Node34", image: "../static/Imgs/snow.png", details: "Node 12单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 35, name: "Node35", image: "../static/Imgs/snow.png", details: "Node 13单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 36, name: "Node36", image: "../static/Imgs/snow.png", details: "Node 9单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 37, name: "Node37", image: "../static/Imgs/snow.png", details: "Node 10单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 38, name: "Node38", image: "../static/Imgs/snow.png", details: "Node 11单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 39, name: "Node39", image: "../static/Imgs/snow.png", details: "Node 12单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 40, name: "Node40", image: "../static/Imgs/snow.png", details: "Node 9单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: 41, name: "Node41", image: "../static/Imgs/snow.png", details: "Node 10单个结点的描述，运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//
+//
+//
+//];
+//const links = [
+//    { id: "edge1", source: 1, target: 2, description: "Link 1", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge2", source: 2, target: 3, description: "Link 2", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge3", source: 3, target: 4, description: "Link 3", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge4", source: 2, target: 12, description: "Link 4", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge5", source: 2, target: 13, description: "Link 5这是你的世界", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge6", source: 5, target: 1, description: "Link 6", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge7", source: 1, target: 7, description: "Link 7", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge8", source: 3, target: 8, description: "Link 8", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge9", source: 5, target: 9, description: "Link 9", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge10", source: 2, target: 10, description: "Link 10", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge11", source: 3, target: 13, description: "Link 11", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge12", source: 5, target: 11, description: "Link 12", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge13", source: 4, target: 13, description: "Link 13", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge14", source: 2, target: 6, description: "Link 14", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge15", source: 8, target: 12, description: "Link 15", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge16", source: 9, target: 1, description: "Link 16", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge17", source: 7, target: 8, description: "Link 17", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge18", source: 7, target: 15, description: "Link 18", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge19", source: 11, target: 14, description: "Link 19", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge20", source: 21, target: 3, description: "Link 20", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge21", source: 20, target: 4, description: "Link 21", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge22", source: 20, target: 12, description: "Link 22", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge23", source: 19, target: 13, description: "Link 23这是你的世界", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge24", source: 18, target: 1, description: "Link 24", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge25", source: 10, target: 17, description: "Link 25", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge26", source: 3, target: 18, description: "Link 26", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge27", source: 9, target: 10, description: "Link 28", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge28", source: 13, target: 16, description: "Link 29", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge29", source: 5, target: 14, description: "Link 30", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge30", source: 12, target: 16, description: "Link 32", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge31", source: 18, target: 12, description: "Link 33", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//    { id: "edge32", source: 19, target: 11, description: "Link 34", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 1 },
+//
+//    { id: "edge33", source: 1, target: 22, description: "Link 21", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge34", source: 1, target: 23, description: "Link 22", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge35", source: 1, target: 24, description: "Link 23这是你的世界", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge36", source: 1, target: 25, description: "Link 24", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge37", source: 1, target: 26, description: "Link 25", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge38", source: 1, target: 27, description: "Link 26", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge39", source: 1, target: 28, description: "Link 28", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge40", source: 29, target: 1, description: "Link 29", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge41", source: 1, target: 30, description: "Link 30", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge42", source: 1, target: 31, description: "Link 32", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge43", source: 1, target: 32, description: "Link 33", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//
+//    { id: "edge44", source: 2, target: 33, description: "Link 21", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge45", source: 2, target: 34, description: "Link 22", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge46", source: 2, target: 35, description: "Link 23这界", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge47", source: 2, target: 36, description: "Link 24", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge48", source: 2, target: 37, description: "Link 25", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge49", source: 2, target: 38, description: "Link 26", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge50", source: 2, target: 39, description: "Link 28", details: "details-link3本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge51", source: 2, target: 40, description: "Link 29", details: "details-link1本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//    { id: "edge52", source: 2, target: 41, description: "Link 30", details: "details-link2本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略", isShown: 0 },
+//
+//];
+
+// 提取所有节点的 id，获取邻接矩阵
+//const nodeIds = nodes.map(node => node.id);
+
+// 创建一个二维数组来表示邻接矩阵，初始值为 0
+
+
+// 单个节点的包含关系
+const nodesContain = [
+    { id: 1, name: "Node1", relations: ["experience", "influence", "attribution", "other", "enemy", "career", "love", "family"], title: ["亲历", "影响", "归属", "其他", "对立", "工作", "爱情", "亲情"] },
+    { id: 2, name: "Node2", relations: ["experience", "influence", "attribution", "other", "enemy", "career", "love"], title: ["亲历", "影响", "归属", "其他", "对立", "工作", "爱情"] },
+    { id: 3, name: "Node3", relations: ["experience", "influence", "attribution", "other", "enemy", "career"], title: ["亲历", "影响", "归属", "其他", "对立", "工作"] },
+    { id: 4, name: "Node4", relations: ["experience", "influence", "attribution", "other", "enemy"], title: ["亲历", "影响", "归属", "其他", "对立"] },
+    { id: 5, name: "Node5", relations: ["experience", "influence", "attribution", "other"], title: ["亲历", "影响", "归属", "其他"] },
+    { id: 6, name: "Node6", relations: ["experience", "influence"], title: ["亲历", "影响"] },
+    { id: 7, name: "Node7", relations: ["experience"], title: ["亲历"] },
+    { id: 8, name: "Node8", relations: ["influence", "attribution"], title: ["影响", "归属"] },
+    { id: 9, name: "Node9", relations: ["other", "enemy", "career"], title: ["其他", "对立", "工作"] },
+    { id: 10, name: "Node10", relations: ["attribution", "other", "enemy", "career"], title: ["归属", "其他", "对立", "工作"] },
+    { id: 11, name: "Node11", relations: ["experience", "influence", "attribution", "other", "enemy", "career"], title: ["亲历", "影响", "归属", "其他", "对立", "工作"] },
+    { id: 12, name: "Node12", relations: ["experience", "influence", "attribution", "enemy", "career"], title: ["亲历", "影响", "归属", "对立", "工作"] },
+    { id: 13, name: "Node13", relations: ["experience", "influence", "attribution", "other", "enemy", "career"], title: ["亲历", "影响", "归属", "其他", "对立", "工作"] },
+    { id: 14, name: "Node14", relations: ["experience", "enemy", "career"], title: ["亲历", "对立", "工作"] },
+    { id: 15, name: "Node15", relations: ["experience", "influence", "career"], title: ["亲历", "影响", "工作"] },
+    { id: 16, name: "Node16", relations: ["experience", "influence", "attribution", "other", "enemy"], title: ["亲历", "影响", "归属", "其他", "对立"] },
+    { id: 17, name: "Node17", relations: ["experience", "influence", "attribution", "other", "enemy", "career"], title: ["亲历", "影响", "归属", "其他", "对立", "工作"] },
+    { id: 18, name: "Node18", relations: ["experience", "influence"], title: ["亲历", "影响"] },
+    { id: 19, name: "Node19", relations: ["experience", "influence", "attribution", "other"], title: ["亲历", "影响", "归属", "其他"] },
+    { id: 20, name: "Node20", relations: ["career"], title: ["工作"] },
+    { id: 21, name: "Node21", relations: ["experience"], title: ["亲历"] },
+];
+
+// 单个节点的包含关系
+const nodesRelation = [
+    { id: 1, name: "Node1", experience: ["edge33", "edge34", "edge35"], influence: ["edge36"], attribution: ["edge37"], other: ["edge38"], enemy: ["edge39"], career: ["edge40", "edge40"], love: ["edge41"], family: ["edge42"] },
+    { id: 2, name: "Node2", experience: ["edge43"], influence: ["edge44"], attribution: ["edge45"], other: ["edge46", "edge47"], enemy: ["edge48"], career: ["edge49", "edge50"], love: ["edge51"] },
+    // { id: 3, name: "Node3", experience: [50], influence: [51], attribution: [52, 53, 54], other: [55], enemy: [56], career: [57] },
+    // { id: 4, name: "Node4", experience: [58], influence: [59, 60], attribution: [61], other: [62], enemy: [63] },
+    // { id: 5, name: "Node5", experience", "influence", "attribution", "other"], title: ["亲历", "影响", "归属", "其他"] },
+    // { id: 6, name: "Node6", experience", "influence"], title: ["亲历", "影响"] },
+    // { id: 7, name: "Node7", experience"], title: ["亲历"] },
+    // { id: 8, name: "Node8", influence", "attribution"], title: ["影响", "归属"] },
+    // { id: 9, name: "Node9", other", "enemy", "career"], title: ["其他", "对立", "工作"] },
+    // { id: 10, name: "Node10", attribution", "other", "enemy", "career"], title: ["归属", "其他", "对立", "工作"] },
+    // { id: 11, name: "Node11", experience", "influence", "attribution", "other", "enemy", "career"], title: ["亲历", "影响", "归属", "其他", "对立", "工作"] },
+    // { id: 12, name: "Node12", experience", "influence", "attribution", "enemy", "career"], title: ["亲历", "影响", "归属", "对立", "工作"] },
+    // { id: 13, name: "Node13", experience", "influence", "attribution", "other", "enemy", "career"], title: ["亲历", "影响", "归属", "其他", "对立", "工作"] },
+    // { id: 14, name: "Node14", experience", "enemy", "career"], title: ["亲历", "对立", "工作"] },
+    // { id: 15, name: "Node15", experience", "influence", "career"], title: ["亲历", "影响", "工作"] },
+    // { id: 16, name: "Node16", experience", "influence", "attribution", "other", "enemy"], title: ["亲历", "影响", "归属", "其他", "对立"] },
+    // { id: 17, name: "Node17", experience", "influence", "attribution", "other", "enemy", "career"], title: ["亲历", "影响", "归属", "其他", "对立", "工作"] },
+    // { id: 18, name: "Node18", experience", "influence"], title: ["亲历", "影响"] },
+    // { id: 19, name: "Node19", experience", "influence", "attribution", "other"], title: ["亲历", "影响", "归属", "其他"] },
+    // { id: 20, name: "Node20", career"], title: ["工作"] },
+    // { id: 21, name: "Node21", experience"], title: ["亲历"] },
+];
+
+
+
+// 输出邻接矩阵
+//console.log("adjacencyMatrix");
+//console.log(adjacencyMatrix);
+
+// for (let i = 18; i <= 57; i++) {
+//     links.push({
+//         id: "edge" + i,
+//         source: Math.floor(Math.random() * 13) + 1,
+//         target: Math.floor(Math.random() * 13) + 1,
+//         description: "Link " + i,
+//         details:
+//             "details-link" +
+//             (i % 3 + 1) +
+//             "本文详细描述了运用C4.5算法对约简后的训练集进行数据挖掘的具体实现方法，对由此产生的模型进行了分析、验证，最后，根据得出的规则，给出了针对不同群体学生的教学策略"
+//     });
+// }
+// 定义箭头样式
+//三角样式的箭头
+// d3.select("#graph").append("defs").append("marker")
+//     .attr("id", "arrowhead")
+//     .attr("viewBox", "-10 -10 20 20")
+//     .attr("refX", 100)
+//     .attr("refY", 0)
+//     .attr("markerWidth", 16)
+//     .attr("markerHeight", 16)
+//     // 当orient属性设置为auto时，SVG元素（例如箭头标记）
+//     // 会根据其所连接的路径或线段的方向自动调整其朝向。这意味着箭头标记将根据路径的走向自动旋转
+//     // ，以确保箭头指向路径的终点。
+//     .attr("orient", "auto")
+//     .append("path")
+//     .attr("fill", "azure")
+//     .attr("d", "M-10,-6L0,0L-10,6");
+d3.select("#graph").append("defs").append("marker")
+    .attr("id", "arrowhead")
+    .attr("viewBox", "0 0 1400 800")
+    .attr("refX", 100)
+    .attr("refY", 0)
+    .attr("markerWidth", 16)
+    .attr("markerHeight", 16)
+    // 当orient属性设置为auto时，SVG元素（例如箭头标记）
+    // 会根据其所连接的路径或线段的方向自动调整其朝向。这意味着箭头标记将根据路径的走向自动旋转
+    // ，以确保箭头指向路径的终点。
+    .attr("orient", "auto")
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "azure")
+    .attr("d", "M2,-6 L8,0 L2,6");
+// 创建力导向图模拟器
+const simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(d => d.id).distance(50))
+    .force("collide", d3.forceCollide(50)) // 避免节点的重叠
+    .force("charge", d3.forceManyBody().strength(50)) // 部分线相交
+    .force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+// 创建节点选择集并绑定数据
+const circleType = ["experience", "influence", "attribution", "other", "enemy", "career", "love", "family"];
+const circleTypeC = ["亲历", "影响", "归属", "其他", "对立", "工作", "爱情", "亲情"];
+
+function removeElementsByClass(className) {
+    const elements = document.getElementsByClassName(className);
+    while (elements.length > 0) {
+        const element = elements[0];
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+        element.parentNode.removeChild(element);
+    }
+}
+
+
+let circle3List = null;
+const node = d3.select("#graph").selectAll(".node")
+    .data(nodes)
+    .enter()
+    .append("g")
+    .attr("id", function (d) {
+        return d.id;
+    })
+    .on('click', function (d) {
+        //  通过d获取数组值
+        const data = d3.select(this).datum();
+        var nodeContainer = document.getElementsByClassName('node-container')[0];
+        const circleDetail = document.querySelector('.circle-detail');
+        const title = circleDetail.querySelector('a.title');
+        const content = document.querySelector('.content');
+
+        const b = document.createElement('b');
+        const p = document.createElement('p');
+
+        p.appendChild(b);
+
+        aText = data.name;//d.name
+        bText = data.name;//d.name
+        pText = data.details;//d.detail
+        //点击事件圆环ID
+        const circleId = data.id;
+        const gElement = document.getElementById(circleId);
+        const foreignObject = gElement.querySelector("foreignObject");
+        if (nodeContainer.classList.contains('hide')) {
+            nodeContainer.classList.remove('hide');
+            nodeContainer.classList.add('active');
+            title.innerHTML = aText;
+            p.innerHTML = "<b>" + bText + "</b>" + pText;
+            content.appendChild(p);
+
+            foreignObject.style.display = "block";
+
+        } else if (nodeContainer.classList.contains('active')) {
+            nodeContainer.classList.remove('active');
+            nodeContainer.classList.add('hide');
+            content.innerHTML = '';
+            foreignObject.style.display = "none";
+        }
+        //分区
+        // 创建<div class="circle-3">元素
+        // removeElementsByClass('circle-3');
+        const circleContainer = document.querySelector('.circle-3');
+        circleContainer.innerHTML = '';
+        // circleContainer.className = 'circle-3';
+
+        // 创建<ul class="circle-name-list">元素
+        const ulElement = document.createElement('ul');
+        ulElement.className = 'circle-name-list';
+
+        event.stopPropagation();
+
+        // 创建<li>元素并设置属性和样式
+        const items = [];
+        items.length = 0;
+        console.log(data.id);
+        const relationsArray1 = nodesContain[data.id - 1].relations;
+        const relationsArrayTitle = nodesContain[data.id - 1].title;
+        let step1 = 90 / (relationsArray1.length);
+        let origindeg1 = 90 - 90 / ((relationsArray1.length) * 2);
+        for (let i = 0; i < relationsArray1.length; i++) {
+            const dataId0 = relationsArray1[i];
+            const rota = origindeg1 - step1 * i;
+
+            // const rotate = "" + rota;
+            const title = relationsArrayTitle[i];//-90
+            //-90
+            const transform0 = "-" + rota + "deg";//-90;//-90
+            items.push({ dataId: dataId0, title: title, transform: transform0 });
+
+        }
+        items.forEach(item => {
+            const liElement = document.createElement('li');
+            liElement.className = `circle-item circle-3-${items.indexOf(item)}`;
+            liElement.setAttribute('data-id', item.dataId);
+            liElement.style.transform = `rotate(${item.transform})`;
+            liElement.style.display = 'none';
+
+            const spanElement = document.createElement('span');
+            spanElement.className = 'title';
+            spanElement.textContent = item.title;
+
+            liElement.appendChild(spanElement);
+            ulElement.appendChild(liElement);
+        });
+
+        // 将<ul>元素添加到<div class="circle-3">元素中
+        circleContainer.appendChild(ulElement);
+
+        circle3List = ulElement;
+
+        const circleContainer2 = document.querySelector('.circle-2');
+        // circleContainer2.className = 'circle-2';
+        circleContainer2.innerHTML = '';
+
+        // 创建<ul class="circle-list">元素
+        const ulElement2 = document.createElement('ul');
+        ulElement2.className = 'circle-list';
+
+        // 创建<li>元素并设置属性和样式
+        const items2 = [];
+        items2.length = 0;
+        console.log(data.id);
+        const relationsArray = nodesContain[data.id - 1].relations;
+        let step2 = 90 / (relationsArray.length);
+        let origindeg = 90;
+        for (let i = 0; i < relationsArray.length; i++) {
+            const dataId = relationsArray[i];
+            const rota = origindeg - step2 * i;
+
+            const rotate = "" + rota;
+            const transform = "-" + rota + "deg";//-90
+            //-90
+            const titleClass = relationsArray[i];//-90
+            items2.push({ dataId: dataId, transform: transform, rotate: rotate, titleClass: titleClass });
+
+        }
+        const rotete3 = 90 / (relationsArray.length * 2) - 2.46;
+        items2.forEach(item => {
+            const liElement2 = document.createElement('li');
+            liElement2.className = `circle-item circle-2-${items2.indexOf(item)}`;
+            liElement2.setAttribute('id', "circle-2-" + items2.indexOf(item));//item 数组下标
+            liElement2.setAttribute('data-id', item.dataId);
+            liElement2.style.transform = `rotate(${item.transform})`;
+            liElement2.setAttribute('data-rotate', item.rotate);
+
+            const spanElement2 = document.createElement('span');
+            spanElement2.className = `title ${item.titleClass}`;
+            spanElement2.style.transform = 'rotate(' + rotete3 + 'deg)';
+
+            liElement2.appendChild(spanElement2);
+            ulElement2.appendChild(liElement2);
+
+            liElement2.addEventListener('mouseover', function () {
+                // 在这里添加鼠标移动到上面的点击事件的处理逻辑
+                const liClass = liElement2.getAttribute('class');
+                const splitArray = liClass.split("-");
+                const lastElement = splitArray.pop();
+                console.log(lastElement);
+                console.log(liClass);
+                const t = `.circle-item.circle-3-${lastElement}`;
+                if (circle3List) {
+                    // 例如，你可以获取其中的第一个子元素
+                    const firstItem = circle3List.querySelector(t);
+                    console.log('鼠标移动到上面的点击事件被触发');
+                    console.log(t);
+                    console.log(firstItem);
+                    firstItem.style.display = 'list-item';
+                }
+            });
+            liElement2.addEventListener('mouseout', function () {
+                // 在这里添加鼠标移动到上面的点击事件的处理逻辑
+                const liClass = liElement2.getAttribute('class');
+                const splitArray = liClass.split("-");
+                const lastElement = splitArray.pop();
+                console.log(lastElement);
+                console.log(liClass);
+                const t = `.circle-item.circle-3-${lastElement}`;
+                if (circle3List) {
+                    // 例如，你可以获取其中的第一个子元素
+                    const firstItem = circle3List.querySelector(t);
+                    console.log('鼠标移动到上面的点击事件被触发');
+                    console.log(t);
+                    console.log(firstItem);
+                    firstItem.style.display = 'none';
+                }
+            });
+            liElement2.addEventListener('click', function () {
+                // 获取当前 li 元素的 class 属性值
+                var currentClassName = liElement2.getAttribute('class');
+                // 判断当前是否已经选中
+                if (currentClassName.indexOf('selected') === -1) {
+                    // 如果未选中，则添加 selected 类名
+                    liElement2.setAttribute('class', currentClassName + ' selected');
+                    const liId = liElement2.getAttribute('id');
+                    const liDataId = liElement2.getAttribute('data-id');
+                    const lastDashIndex = liId.lastIndexOf("-");
+                    const numberString = liId.substring(lastDashIndex + 1);
+                    const number = parseInt(data.id - 1);// 0
+                    console.log("number = " + number);
+                    let selectRelation;
+                    let selectNode = [];
+                    for (let i = 0; i < nodesRelation.length; i++) {
+                        const node = nodesRelation[i];
+                        if (i == number) {
+                            if (liDataId == "experience") {
+                                if (node.hasOwnProperty("experience")) {
+                                    selectRelation = nodesRelation[number].experience;
+                                }
+                            }
+                            else if (liDataId == "influence") {
+                                if (node.hasOwnProperty("influence")) {
+                                    selectRelation = nodesRelation[number].influence;
+                                }
+                            }
+                            else if (liDataId == "attribution") {
+                                if (node.hasOwnProperty("attribution")) {
+                                    selectRelation = nodesRelation[number].attribution;
+                                }
+                            }
+                            else if (liDataId == "enemy") {
+                                if (node.hasOwnProperty("enemy")) {
+                                    selectRelation = nodesRelation[number].enemy;
+                                }
+                            }
+                            else if (liDataId == "career") {
+                                if (node.hasOwnProperty("career")) {
+                                    selectRelation = nodesRelation[number].career;
+                                }
+                            }
+                            else if (liDataId == "love") {
+                                if (node.hasOwnProperty("love")) {
+                                    selectRelation = nodesRelation[number].love;
+                                }
+                            }
+                            else if (liDataId == "family") {
+                                if (node.hasOwnProperty("family")) {
+                                    selectRelation = nodesRelation[number].family;
+                                }
+                            }
+                            else if (liDataId == "other") {
+                                if (node.hasOwnProperty("other")) {
+                                    selectRelation = nodesRelation[number].other;
+                                }
+                            }
+                        }
+                    }
+                    console.log("liDataId");
+                    console.log(liDataId);
+                    console.log(selectRelation);
+
+                    linkPath.style("display", function (d) {
+                        if ((selectRelation.includes(d.id)) && (d.isShown == 0)) {
+                            return "block";
+                        }
+                        else {
+                            return "null";
+                        }
+                    });
+                    for (var i = 0; i < selectRelation.length; i++) {
+                        for (var j = 0; j < links.length; j++) {
+                            if (selectRelation[i] == links[j].id) {
+                                selectNode.push(links[j].source.id);
+                                selectNode.push(links[j].target.id);
+                            }
+                        }
+                    }
+                    var uniqueSelectNode = [...new Set(selectNode)];
+                    console.log("uniqueSelectNode");
+                    console.log(uniqueSelectNode);
+                    node.style("display", function (d) {
+                        if ((uniqueSelectNode.includes(d.id)) && (d.isShown == 0)) {
+                            console.log(d.id);
+                            return "block";
+                        }
+                        else {
+                            return "null";
+                        }
+                    });
+                } else {
+                    // 如果已选中，则移除 selected 类名
+                    liElement2.setAttribute('class', currentClassName.replace('selected', '').trim());
+
+                    const liId = liElement2.getAttribute('id');
+                    const liDataId = liElement2.getAttribute('data-id');
+
+
+                    const lastDashIndex = liId.lastIndexOf("-");
+                    const numberString = liId.substring(lastDashIndex + 1);
+                    const number = parseInt(data.id - 1);// 0
+                    console.log("number = " + number);
+                    let selectRelation;
+                    let selectNode = [];
+
+                    for (let i = 0; i < nodesRelation.length; i++) {
+                        const node = nodesRelation[i];
+                        // console.log("id:", node.id);
+                        // console.log("name:", node.name);
+                        if (i == number) {
+                            if (liDataId == "experience") {
+                                if (node.hasOwnProperty("experience")) {
+                                    selectRelation = nodesRelation[number].experience;
+                                }
+                            }
+                            else if (liDataId == "influence") {
+                                if (node.hasOwnProperty("influence")) {
+                                    selectRelation = nodesRelation[number].influence;
+                                }
+                            }
+                            else if (liDataId == "attribution") {
+                                if (node.hasOwnProperty("attribution")) {
+                                    selectRelation = nodesRelation[number].attribution;
+                                }
+                            }
+                            else if (liDataId == "enemy") {
+                                if (node.hasOwnProperty("enemy")) {
+                                    selectRelation = nodesRelation[number].enemy;
+                                }
+                            }
+                            else if (liDataId == "career") {
+                                if (node.hasOwnProperty("career")) {
+                                    selectRelation = nodesRelation[number].career;
+                                }
+                            }
+                            else if (liDataId == "love") {
+                                if (node.hasOwnProperty("love")) {
+                                    selectRelation = nodesRelation[number].love;
+                                }
+                            }
+                            else if (liDataId == "family") {
+                                if (node.hasOwnProperty("family")) {
+                                    selectRelation = nodesRelation[number].family;
+                                }
+                            }
+                            else if (liDataId == "other") {
+                                if (node.hasOwnProperty("other")) {
+                                    selectRelation = nodesRelation[number].other;
+                                }
+                            }
+                        }
+                    }
+
+
+                    console.log("liDataId");
+                    console.log(liDataId);
+                    console.log(selectRelation);
+
+                    linkPath.style("display", function (d) {
+                        if ((selectRelation.includes(d.id)) && (d.isShown == 0)) {
+                            return "none";
+                        }
+                        else {
+                            return "null";
+                        }
+                    });
+
+                    for (var i = 0; i < selectRelation.length; i++) {
+                        for (var j = 0; j < links.length; j++) {
+                            if (selectRelation[i] == links[j].id) {
+                                selectNode.push(links[j].source.id);
+                                selectNode.push(links[j].target.id);
+                            }
+                        }
+                    }
+                    var uniqueSelectNode = [...new Set(selectNode)];
+                    console.log("uniqueSelectNode");
+                    console.log(uniqueSelectNode);
+                    node.style("display", function (d) {
+                        if ((uniqueSelectNode.includes(d.id)) && (d.isShown == 0)) {
+                            console.log(d.id);
+                            return "none";
+                        }
+                        else {
+                            return "null";
+                        }
+                    });
+
+                }
+            });
+        });
+        circleContainer2.appendChild(ulElement2);
+    })
+    .attr("class", "node")
+    // .classed("focus-circle", true)
+    .raise()
+    // 将drag(simulation)函数绑定到节点选择集上。
+    .call(drag(simulation));
+node.filter(function (d) {
+    return d.isShown === 0;
+})
+    .style("display", "none");
+
+// 创建图像元素并插入图片
+node.append("image")
+    .attr("class", "node-image")
+    .attr("x", -20)
+    .attr("y", -20)
+    .attr("xlink:href", d => d.image);
+// .attr("width", -10)
+// .attr("height", -10);
+
+// 添加节点标签
+node.append("text")
+    .attr("class", "node-label")
+    .attr("dy", 25)
+    .text(d => d.name);
+
+// node.append("div")
+//     .attr("class", "focus-circle")
+//     .attr("x", -20)
+//     .attr("y", -20);
+node.append("foreignObject")
+    .attr("width", 40)
+    .attr("height", 40)
+    .attr("x", -20)
+    .attr("y", -20)
+    .append("xhtml:div") // 在<foreignObject>中添加<div>元素
+    .classed("focus-circle", true)
+    .raise();
+//边
+
+
+// 创建边选择集并绑定数据
+const linkPath = d3.select("#graph").selectAll(".link")
+    .data(links)
+    .enter()
+    .append("path")
+    .attr("class", "link")
+    .attr("marker-end", "url(#arrowhead)")
+    .attr("id", (d, i) => `${d.id}`)
+    .lower()
+    .on("mouseover", function (d) {
+        d3.select(this).style("stroke", "orange"); // 设置线条颜色为橙色
+    })
+    .on("mouseout", function (d) {
+        d3.select(this).style("stroke", ""); // 恢复原来的颜色
+    })
+    .on("click", handleLinkClick);
+
+
+linkPath.filter(function (d) {
+    return d.isShown === 0;
+})
+    .style("display", "none");
+
+
+const graphClick = d3.select("#graph");
+
+graphClick.on('click', function () {
+    // 处理点击事件的逻辑
+    clickBody();
+});
+
+graphClick.on('dblclick', function () {
+    location.reload();
+})
+
+function handleLinkClick(d) {
+    console.log("handleLinkClick");
+    console.log(d);
+    const data = d3.select(this).datum();
+    const linkId = data.id;
+    // 创建<section>元素 from  relation to
+    const index = byIdFindArrayIndex(linkId);
+    // console.log(byEdgeSourceOrTargetFindNodeID(links[index].source));
+    // console.log(byEdgeSourceOrTargetFindNodeID(links[index].target));
+    const x = byEdgeSourceOrTargetFindNodeID(links[index].source.id);
+    const y = byEdgeSourceOrTargetFindNodeID(links[index].target.id);
+
+    const section = document.createElement("section");
+    console.log("x=" + x);
+    console.log("x=" + y);
+
+    if (x >= 0 && x < nodes.length) {
+        let startX;
+        let startY;
+        let endX;
+        let endY;
+
+        const elementx = document.getElementById("" + x);
+        if (elementx) {
+            const rect = elementx.getBoundingClientRect();
+            startX = rect.left + 40 / 2;
+            startY = rect.top + 40 / 2;//46.6
+            console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+        }
+        const elementy = document.getElementById("" + y);
+        if (elementy) {
+            const rect = elementy.getBoundingClientRect();
+            endX = rect.left + 40 / 2;
+            endY = rect.top + 46.3 / 3;//46.6
+            console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+        }
+
+        const midX = (startX + endX) / 2 - 160;
+        const midY = (startY + endY) / 2 + 10;
+
+        console.log("midX = " + midX + "midY = " + midY);
+
+        section.setAttribute("class", "netLinkInfo-box panel-relation");
+
+        section.setAttribute("style", `left: ${midX}px; top: ${midY}px;`);
+        console.log(`startX: ${midX}, startY: ${midY}`);
+    } else {
+        console.log("Invalid index for coordinates array");
+    }
+
+    // 创建<div>元素，并添加class和id属性
+    const div = document.createElement("div");
+    div.setAttribute("class", "atobNetLinkInfo-li");
+    div.setAttribute("id", "5cad59ab2a99a600018b05dc");
+
+    // 创建关系信息框的标题部分
+    const titleDiv = document.createElement("div");
+    titleDiv.setAttribute("class", "atobNetLinkInfo-title");
+
+    // 创建第一个人物名称<span>元素，设置title属性和文本内容
+    const name1Span = document.createElement("span");
+    const fromtext = bySourceFindName(links[index].source);
+    const totext = bySourceFindName(links[index].target);
+
+    name1Span.setAttribute("title", fromtext);
+    name1Span.textContent = fromtext;
+    titleDiv.appendChild(name1Span);
+
+    // 创建关系描述<span>元素
+    const relationDescSpan = document.createElement("span");
+    relationDescSpan.setAttribute("class", "relationDesc");
+
+    // 创建关系描述中的箭头图标<span>元素
+    const rightIconSpan = document.createElement("span");
+    rightIconSpan.setAttribute("class", "right-icon");
+
+    // 创建关系描述中的文本<span>元素
+    const descTextSpan = document.createElement("span");
+    const relationtext = links[index].description;
+    descTextSpan.setAttribute("class", "desc-text");
+    descTextSpan.textContent = relationtext;
+    // descTextSpanElement.style.position = "relative";
+    // descTextSpanElement.style.top = "-10px";
+
+    // 将箭头图标和文本元素添加到关系描述<span>元素中
+    // relationDescSpan.appendChild(leftIconSpan);
+    relationDescSpan.appendChild(rightIconSpan);
+    relationDescSpan.appendChild(descTextSpan);
+    // 将关系描述<span>元素添加到标题部分<div>元素中
+    titleDiv.appendChild(relationDescSpan);
+
+    // 创建第二个人物名称<span>元素，设置title属性和文本内容
+    const name2Span = document.createElement("span");
+    name2Span.setAttribute("title", totext);
+    name2Span.textContent = totext;
+    titleDiv.appendChild(name2Span);
+
+    // 将标题部分<div>元素添加到关系信息框<div>元素中
+    div.appendChild(titleDiv);
+
+    // 创建关系信息框的内容部分<div>元素
+    const contentDiv = document.createElement("div");
+    contentDiv.setAttribute("class", "atobNetLinkInfo-content");
+
+    // 创建描述信息<div>元素，并设置文本内容
+    const descriptionDiv = document.createElement("div");
+    descriptionDiv.setAttribute("class", "atobNetLinkInfo-description");
+    descriptionDiv.textContent = links[index].details;
+    // 将描述信息<div>元素添加到内容部分<div>元素中
+    contentDiv.appendChild(descriptionDiv);
+
+    // 将标题部分和内容部分添加到关系信息框<div>元素中
+    div.appendChild(titleDiv);
+    div.appendChild(contentDiv);
+
+    // 将关系信息框<div>元素添加到<section>元素中
+    section.appendChild(div);
+
+    // 将整个<section>元素添加到<body>下
+    document.body.appendChild(section);
+    sectionExists = true;
+
+    const width = descTextSpan.offsetWidth;
+    // console.log("Width:", width);
+    const descTextSpanElement = document.querySelector(".desc-text");
+    descTextSpanElement.style.position = "relative";
+    descTextSpanElement.style.top = "-1px";
+
+    descTextSpanElement.style.left = "-50px";
+    const rightIconElement = document.querySelector(".right-icon");
+    rightIconElement.style.position = "relative";
+    rightIconElement.style.top = "3px";
+
+    event.stopPropagation();
+
+}
+
+function clickBody() {
+
+    // location.reload();
+
+    const tnodes = d3.select("#graph").selectAll(".node");
+    const tlinks = d3.select("#graph").selectAll(".link");
+    const tlinkGroups = d3.select("#graph").selectAll(".link-group");
+
+    // 将.link组件放到.node和.link-group的下层
+    tlinks.each(function () {
+        const link = d3.select(this);
+        // 设置.link的z-index值小于.node和.link-group的z-index值
+        link.style("z-index", "-1");
+
+        // 将.link元素放到.node元素的下方
+        const parentNode = link.node().parentNode;
+        parentNode.insertBefore(link.node(), tnodes.nodes()[0]);
+
+        // 将.link元素放到.link-group元素的下方
+        tlinkGroups.each(function () {
+            const linkGroup = d3.select(this);
+            if (link.classed(linkGroup.attr("class"))) {
+                linkGroup.node().insertBefore(link.node(), linkGroup.node().firstChild);
+            }
+        });
+    });
+
+
+
+    // 1 选择要删除的<section>元素
+    const sectionToRemove = document.querySelector(".netLinkInfo-box");
+    // 2 检查是否存在需要删除的<section>元素
+    if (sectionToRemove) {
+        // 选择该元素的父节点，并调用removeChild()方法将其从DOM中移除
+        sectionToRemove.parentNode.removeChild(sectionToRemove);
+    }
+    //3
+    const items = document.querySelectorAll('.item');
+    items.forEach(item => {
+        if (item.classList.contains("active")) {
+            item.classList.remove('active');
+        }
+    });
+
+    var searchgraph = document.querySelector("#searchgraph");
+    if (searchgraph) {
+        searchgraph.parentNode.removeChild(searchgraph);
+    }
+
+    searchgraph = document.querySelector("#searchgraph2");
+    if (searchgraph) {
+        searchgraph.innerHTML = "";
+        searchgraph.parentNode.removeChild(searchgraph);
+    }
+    // 4
+    d3.selectAll("#graph")
+        .style("opacity", 1);
+    //5
+    d3.selectAll("#graph > *")
+        .style("opacity", 1);// 将 #graph 元素及其包含的所有内容的透明度设置为1，使其恢复可见
+}
+
+const linkGroup = d3.select("#graph").selectAll(".link-group")
+    .data(links)
+    .enter()
+    .append("g")
+    .attr("class", "link-group")
+    .attr("id", (d, i) => `link-group-${d.id}`);
+linkGroup.filter(function (d) {
+    return d.isShown === 0;
+})
+    .style("display", "none");
+const linkRect = linkGroup.append("rect")
+    .attr("class", "link-rect")
+    .attr("rx", 5)
+    .attr("ry", 5);
+const linkText = linkGroup.append("text")
+    .attr("class", "link-text")
+    .text(d => d.description)
+    .raise();
+
+// 更新节点、边和文本的位置
+function ticked() {
+
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+    // 更新线的路径
+    linkPath.attr("d", d => {
+        return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
+    });
+    linkGroup.attr("transform", d => {
+        const dx = d.target.x - d.source.x;
+        const dy = d.target.y - d.source.y;
+        const x = (d.source.x + d.target.x) / 2;
+        const y = (d.source.y + d.target.y) / 2;
+        return `translate(${x},${y}) rotate(${Math.atan2(dy, dx) * 180 / Math.PI})`;
+    });
+    linkRect.each(function (d) {
+        const bbox = this.getBBox();
+        const padding = 10;
+        const text = d3.select(this.parentNode).select(".link-text").node();
+        const textWidth = text ? text.getBBox().width : 0;
+        const textHeight = text ? text.getBBox().height : 0;
+        d3.select(this)
+            .attr("width", textWidth + padding)
+            .attr("height", bbox.height)
+            .attr("x", -textWidth / 2 - padding / 2)
+            .attr("y", -bbox.height / 2 + padding / 32);
+        if (text) {
+            d3.select(text)
+                .attr("x", -textWidth / 2)
+                .attr("y", textHeight / 64 + 2); // 调整文本的垂直位置为矩形框的64分之一处
+        }
+    });
+}
+
+// 定义拖动行为
+function drag(simulation) {
+
+    // 开始拖动
+    function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+
+    }
+    // 拖动中
+    function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+        // d3.select(this)
+        //     .attr("x", event.subject.fx)
+        //     .attr("y", event.subject.fy);
+
+    }
+
+    // 结束拖动
+    function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+
+    }
+
+    return d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+}
+
+// 注册更新回调函数
+// simulation是一个力导向图模拟器对象，ticked则是一个回调函数，用于在每次模拟器更新时执行相应的操作。
+// 模拟器会在每次计算后更新节点和连线的位置信息，并触发"tick"事件。
+// 通过将ticked函数绑定到"tick"事件上，
+// 我们可以在每次模拟器更新时执行一些自定义的操作，
+// 例如更新节点和连线的位置、更新可视化元素的样式等等。
+// 具体来说，ticked函数通常会接收模拟器对象作为参数，
+// 然后根据当前的节点和连线位置信息进行相应的操作。
+// simulation.on("tick", ticked).nodes(coordinates);
+
+simulation.on("tick", ticked);
+//  relation-list
+const relationListUl = document.querySelector('.relation-list');
+var tempData;
+// 获取 ul 元素
+var liClickTime = 0;
+function handleItemClick(i) {
+    const index = i;
+    // event.stopPropagation();
+    return function (event) {
+        // d3.event.stopPropagation();
+        event.stopPropagation(); // 阻止事件冒泡
+        liClickTime += 1;
+        const li = this;
+        if (liClickTime % 2 == 0) {
+            // li.classList.remove("active");
+            // // 选择要删除的<section>元素
+            var activeItems = document.querySelector("#relation-list");
+            // for (var i = 0; i < activeItems.length; i++) {
+            //     activeItems[i].remove();
+            console.log("active");
+
+            console.log(activeItems);
+
+            const sectionToRemove = document.querySelector(".netLinkInfo-box");
+            // 检查是否存在需要删除的<section>元素
+            if (sectionToRemove) {
+                // 选择该元素的父节点，并调用removeChild()方法将其从DOM中移除
+                sectionToRemove.parentNode.removeChild(sectionToRemove);
+            }
+            // console.log("liClickTime");
+
+            // 查找id=relation-list的ul组件中所有li组件
+            // var listItems = document.querySelectorAll("#relation-list li");
+
+            // // 遍历所有li组件
+            // listItems.forEach(function (item) {
+            //     // 检查class是否包含active
+            //     if (item.classList.contains('active')) {
+            //         // 如果包含active，则移除active类
+            //         item.classList.remove('active');
+            //     }
+            // });
+            tempData.classList.remove('active');
+
+            // 选中id为graph下所有的.node、.link和.link-group组件
+            const tnodes = d3.select("#graph").selectAll(".node");
+            const tlinks = d3.select("#graph").selectAll(".link");
+            const tlinkGroups = d3.select("#graph").selectAll(".link-group");
+
+            // 将.link组件放到.node和.link-group的下层
+            tlinks.each(function () {
+                const link = d3.select(this);
+                // 设置.link的z-index值小于.node和.link-group的z-index值
+                link.style("z-index", "-1");
+
+                // 将.link元素放到.node元素的下方
+                const parentNode = link.node().parentNode;
+                parentNode.insertBefore(link.node(), tnodes.nodes()[0]);
+
+                // 将.link元素放到.link-group元素的下方
+                tlinkGroups.each(function () {
+                    const linkGroup = d3.select(this);
+                    if (link.classed(linkGroup.attr("class"))) {
+                        linkGroup.node().insertBefore(link.node(), linkGroup.node().firstChild);
+                    }
+                });
+            });
+            d3.selectAll("#graph > *")
+                .style("opacity", 1);
+            liClickTime = 0;
+        } else {
+            tempData = li;
+            li.classList.add("active");
+            // 获取 SVG 元素
+            relationListClick(index);
+            relationListSection(index);
+        }
+    };
+}
+function relationListClick(index) {// 虚化整个界面，单独显示一个 边关系
+    const sourceid = "" + links[index].source.id;
+    const targetid = "" + links[index].target.id;
+    const linkgroupd = "link-group-" + links[index].description;
+    const linkid = links[index].id;
+
+    d3.selectAll("#graph > *")
+        .style("opacity", 1)
+        .filter(function () {
+            return this.id !== linkid && this.id !== linkgroupd && this.id !== targetid && this.id !== sourceid; // 过滤掉特定子组件和sourceid对应的子组件
+        })
+        .each(function () {
+            this.parentNode.appendChild(this); // 移动过滤掉的组件到上层
+        })
+        .style("opacity", 0.3)
+        ; // 恢复过滤掉的组件的透明度;
+
+}
+function relationListSection(lindex) {
+    console.log("relationListSection");
+    // console.log(d);
+    // const data = links[lindex].id;
+    const linkId = links[lindex].id;
+    // 创建<section>元素 from  relation to
+    const index = byIdFindArrayIndex(linkId);
+
+    const x = byEdgeSourceOrTargetFindNodeID(links[index].source.id);
+    const y = byEdgeSourceOrTargetFindNodeID(links[index].target.id);
+
+    const section = document.createElement("section");
+    console.log("x=" + x);
+    console.log("x=" + y);
+
+    if (x >= 0 && x < nodes.length) {
+        let startX;
+        let startY;
+        let endX;
+        let endY;
+
+        const elementx = document.getElementById("" + x);
+        if (elementx) {
+            const rect = elementx.getBoundingClientRect();
+            startX = rect.left + 40 / 2;
+            startY = rect.top + 40 / 2;//46.6
+            console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+        }
+        const elementy = document.getElementById("" + y);
+        if (elementy) {
+            const rect = elementy.getBoundingClientRect();
+            endX = rect.left + 40 / 2;
+            endY = rect.top + 46.3 / 3;//46.6
+            console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+        }
+
+        const midX = (startX + endX) / 2 - 160;
+        const midY = (startY + endY) / 2 + 10;
+
+        console.log("midX = " + midX + "midY = " + midY);
+
+        section.setAttribute("class", "netLinkInfo-box panel-relation");
+
+        section.setAttribute("style", `left: ${midX}px; top: ${midY}px;`);
+        console.log(`startX: ${midX}, startY: ${midY}`);
+    } else {
+        console.log("Invalid index for coordinates array");
+    }
+
+    // 创建<div>元素，并添加class和id属性
+    const div = document.createElement("div");
+    div.setAttribute("class", "atobNetLinkInfo-li");
+    div.setAttribute("id", "5cad59ab2a99a600018b05dc");
+
+    // 创建关系信息框的标题部分
+    const titleDiv = document.createElement("div");
+    titleDiv.setAttribute("class", "atobNetLinkInfo-title");
+
+    // 创建第一个人物名称<span>元素，设置title属性和文本内容
+    const name1Span = document.createElement("span");
+    const fromtext = bySourceFindName(links[index].source);
+    const totext = bySourceFindName(links[index].target);
+
+    name1Span.setAttribute("title", fromtext);
+    name1Span.textContent = fromtext;
+    titleDiv.appendChild(name1Span);
+
+    // 创建关系描述<span>元素
+    const relationDescSpan = document.createElement("span");
+    relationDescSpan.setAttribute("class", "relationDesc");
+
+    // 创建关系描述中的箭头图标<span>元素
+    const rightIconSpan = document.createElement("span");
+    rightIconSpan.setAttribute("class", "right-icon");
+
+    // 创建关系描述中的文本<span>元素
+    const descTextSpan = document.createElement("span");
+    const relationtext = links[index].description;
+    descTextSpan.setAttribute("class", "desc-text");
+    descTextSpan.textContent = relationtext;
+    // descTextSpanElement.style.position = "relative";
+    // descTextSpanElement.style.top = "-10px";
+
+    // 将箭头图标和文本元素添加到关系描述<span>元素中
+    // relationDescSpan.appendChild(leftIconSpan);
+    relationDescSpan.appendChild(rightIconSpan);
+    relationDescSpan.appendChild(descTextSpan);
+    // 将关系描述<span>元素添加到标题部分<div>元素中
+    titleDiv.appendChild(relationDescSpan);
+
+    // 创建第二个人物名称<span>元素，设置title属性和文本内容
+    const name2Span = document.createElement("span");
+    name2Span.setAttribute("title", totext);
+    name2Span.textContent = totext;
+    titleDiv.appendChild(name2Span);
+
+    // 将标题部分<div>元素添加到关系信息框<div>元素中
+    div.appendChild(titleDiv);
+
+    // 创建关系信息框的内容部分<div>元素
+    const contentDiv = document.createElement("div");
+    contentDiv.setAttribute("class", "atobNetLinkInfo-content");
+
+    // 创建描述信息<div>元素，并设置文本内容
+    const descriptionDiv = document.createElement("div");
+    descriptionDiv.setAttribute("class", "atobNetLinkInfo-description");
+    descriptionDiv.textContent = links[index].details;
+    // 将描述信息<div>元素添加到内容部分<div>元素中
+    contentDiv.appendChild(descriptionDiv);
+
+    // 将标题部分和内容部分添加到关系信息框<div>元素中
+    div.appendChild(titleDiv);
+    div.appendChild(contentDiv);
+
+    // 将关系信息框<div>元素添加到<section>元素中
+    section.appendChild(div);
+
+    // 将整个<section>元素添加到<body>下
+    document.body.appendChild(section);
+    sectionExists = true;
+
+    const width = descTextSpan.offsetWidth;
+    // console.log("Width:", width);
+    const descTextSpanElement = document.querySelector(".desc-text");
+    descTextSpanElement.style.position = "relative";
+    descTextSpanElement.style.top = "-1px";
+
+    descTextSpanElement.style.left = "-50px";
+    const rightIconElement = document.querySelector(".right-icon");
+    rightIconElement.style.position = "relative";
+    rightIconElement.style.top = "3px";
+
+    // event.stopPropagation();
+
+}
+// 创建多个 li 元素
+for (let i = 0; i < links.length; i++) {
+    const li = document.createElement('li');
+    // 添加id relation-page
+    li.setAttribute('id', `relation-page-${i + 1}`);
+    li.classList.add('item');
+    li.addEventListener('click', handleItemClick(i));
+    // 1. 创建 li 内部元素 relation-name
+    const div1 = document.createElement('div');
+    div1.classList.add('relation-name');
+    div1.textContent = links[i].description;
+    // 2. circle
+    const div2 = document.createElement('div');
+    div2.classList.add('circle');
+    // 3. detail下的
+    const div3 = document.createElement('div');
+    div3.classList.add('detail');
+
+    // 左
+    const div3RelationA = document.createElement('div');
+    div3RelationA.classList.add('relation-a');
+    var id_name = links[i].source; //内容 from
+    div3RelationA.textContent = bySourceFindName(id_name);
+
+    // 箭头
+    const div3RelationArrow = document.createElement('div');
+    div3RelationArrow.classList.add('relation-arrow');
+    // 右
+    const div3RelationB = document.createElement('div');
+    div3RelationB.classList.add('relation-b');
+    var id_name = links[i].target;// to
+    div3RelationB.textContent = bySourceFindName(id_name);
+
+    const div3RelationTime = document.createElement('div');
+    div3RelationTime.classList.add('relation-time');
+
+
+    // const div3DescFull = document.createElement('div');
+    // div3DescFull.classList.addclassList.add('desc-full', 'hidden');
+    // div3DescFull.textContent = links[i].details;
+
+    const div3Desc = document.createElement('div');
+    div3Desc.classList.add('desc');// desc
+    div3Desc.textContent = links[i].details;
+
+    const div3C = document.createElement('div');
+    div3C.classList.add('c');
+
+    div3.appendChild(div3RelationA);
+    div3.appendChild(div3RelationArrow);
+    div3.appendChild(div3RelationB);
+    div3.appendChild(div3RelationTime);
+    // div3.appendChild(div3DescFull);
+    div3.appendChild(div3Desc);
+    div3.appendChild(div3C);
+
+    // 将内部元素添加到 li 元素中 
+    li.appendChild(div1);
+    li.appendChild(div2);
+    li.appendChild(div3);
+
+
+    // 将 li 元素添加到 ul 元素中
+    relationListUl.appendChild(li);
+}
+
+function bySourceFindName(id_name) {
+    let j = 0;
+    // console.log("bySourceFindName");
+    for (j = 0; j < nodes.length; j++) {
+        if (id_name.id == nodes[j].id) {
+            return nodes[j].name;
+        }
+    }
+    return j;
+}
+
+// 通过id查找edge的数组的下标,通过边的id找到links中，source和target，即就是nodes中的下标，用于...忘了，回头看看
+function byIdFindArrayIndex(edge_id) {
+    let j = 0;
+    // console.log("bySourceFindName");
+
+    for (j = 0; j < links.length; j++) {
+        if (edge_id == links[j].id) {
+            return j;
+        }
+    }
+    return -1;
+}
+
+function byIdFindArrayIndex2(copied_links, edge_id) {
+    let j = 0;
+    console.log("byIdFindArrayIndex2");
+    copied_links.forEach(link => {
+        console.log(link);
+    })
+
+    for (j = 0; j < copied_links.length; j++) {
+        console.log("edge_id=" + edge_id);
+        console.log("copied_links[j].id=" + copied_links[j].id);
+        if (edge_id == copied_links[j].id) {
+            return j;
+        }
+    }
+    return -1;
+}
+// 通过edge中的source和target，转化成对应的node的id，这些id-1即就是数组下标，用于绘制边上的点击事件
+function byEdgeSourceOrTargetFindNodeID(source_or_target) {
+    // const str = "123";
+    const num = Number(source_or_target);
+    // console.log(num); // 输出: 123
+    return num;
+}
+
+function byEdgeSourceOrTargetFindNodeID2(copied_nodes, source_or_target) {
+    let i = 0;
+    for (i = 0; i < copied_nodes.length; i++) {
+        if (source_or_target == copied_nodes[i].id) {
+            const num = Number(i);
+            return num;
+        }
+    }
+    return -1;
+}
+// 通过结点的名称，查找结点的j+1，即就是id，用于搜索框,直接返回对应数组的下标
+function byNodeNameFindId(node_name) {
+    let j = 0;
+    for (j = 0; j < nodes.length; j++) {
+        // console.log("nodes[j].name" + nodes[j].name);
+        // console.log("nnode_name" + node_name);
+
+        if (nodes[j].name == node_name) {
+            n = j + 1;
+            console.log("byNodeNameFindId=" + n);
+            return j + 1;//直接返回id
+        }
+    }
+    return -1;
+}
+// 通过byNodeNameFindId函数获得的id，在edge中查找与id相关的所有边的结点的信息，得到的是边的数组下标
+function byIdFindEdgesRelationNode(node_id) {
+    let index_array = [];
+    let j = 0;
+    // console.log("bySourceFindName");
+    for (j = 0; j < links.length; j++) {
+        console.log("node_id=" + node_id);
+        console.log("links[j].source=" + links[j].source.id);
+        console.log("links[j].target=" + links[j].target);
+
+        if (node_id == links[j].source.id || node_id == links[j].target.id) {
+            index_array.push(j);
+        }
+    }
+    console.log("index_array=" + index_array);
+    return index_array;
+}
+
+function byIdFindEdgesRelationNode2(node_id) {
+
+    let index_array = [];
+    let temp = [];
+    let j = 0;
+    let uniqueTemp = [];
+
+    console.log("byIdFindEdgesRelationNode2  node_id = " + node_id);
+    for (j = 0; j < links.length; j++) {
+        console.log("node_id=" + node_id);
+        console.log("links[j].source=" + links[j].source.id);
+        console.log("links[j].target=" + links[j].target);
+
+        if (node_id == links[j].source.id) {
+            temp.push(j);
+
+        }
+    }
+    console.log("temp=" + temp);
+    let len = temp.length;
+    for (j = 0; j < len; j++) {
+        console.log("j=" + j);
+        console.log("len=" + len);
+        for (var k = 0; k < links.length; k++) {
+            console.log("temp[j]=" + temp[j]);
+            if (links[temp[j]].target.id == links[k].source.id) {
+                if (!temp.includes(k)) {
+                    temp.push(k);
+                    index_array.push(k);
+                }
+
+                // temp.push(k);
+                console.log("k=" + k);
+                console.log("links[k].source.id=" + links[k].target.id);
+            }
+        }
+        // uniqueTemp = [...new Set(index_array)];
+        // console.log(uniqueTemp);
+        len = temp.length;
+        console.log("temp=" + temp);
+    }
+    console.log("index_array=" + index_array);
+    return temp;
+}
+//根据邻接矩阵，查找两个结点的所有路径，接口是findPathsBetweenNodes
+function findAllPaths(start, end, graph, visited, path, paths) {
+    visited[start] = true;
+    path.push(start);
+
+    if (start === end) {
+        paths.push([...path]);
+    } else {
+        for (let i = 0; i < graph[start].length; i++) {
+            if (graph[start][i] === 1 && !visited[i]) {
+                findAllPaths(i, end, graph, visited, path, paths);
+            }
+        }
+    }
+
+    path.pop();
+    visited[start] = false;
+}
+
+function findPathsBetweenNodes(startNode, endNode, adjacencyMatrix) {
+    const graph = adjacencyMatrix;
+    const visited = new Array(graph.length).fill(false);
+    const paths = [];
+    const path = [];
+    findAllPaths(startNode, endNode, graph, visited, path, paths);
+    return paths;
+}
+
+function byIdFindEdgesRelationNode3(firstId, secondId) {//找到所求边的数组的下标
+
+    let index_array = [];
+    let temp = [];
+    let j = 0;
+
+    // temp.push(node_id - 1);
+    let uniqueTemp = [];
+
+    console.log("byIdFindEdgesRelationNode2  node_id = " + node_id);
+    for (j = 0; j < links.length; j++) {
+        console.log("node_id=" + node_id);
+        console.log("links[j].source=" + links[j].source.id);
+        console.log("links[j].target=" + links[j].target);
+
+        if (node_id == links[j].source.id) {
+            temp.push(j);
+
+        }
+    }
+    console.log("temp=" + temp);
+    let len = temp.length;
+    for (j = 0; j < len; j++) {
+        console.log("j=" + j);
+        console.log("len=" + len);
+        for (var k = 0; k < links.length; k++) {
+            console.log("temp[j]=" + temp[j]);
+            if (links[temp[j]].target.id == links[k].source.id) {
+                if (!temp.includes(k)) {
+                    temp.push(k);
+                    index_array.push(k);
+                }
+
+                // temp.push(k);
+                console.log("k=" + k);
+                console.log("links[k].source.id=" + links[k].target.id);
+            }
+        }
+        // uniqueTemp = [...new Set(index_array)];
+        // console.log(uniqueTemp);
+        len = temp.length;
+        console.log("temp=" + temp);
+    }
+    console.log("index_array=" + index_array);
+    return temp;
+}
+
+function byIndexLinksCopyLink(index_array) {
+    const copieLinks = [];
+    for (let i = 0; i < index_array.length; i++) {
+        const index = index_array[i];
+        const originalLink = links[index];
+        const copieLink = { ...originalLink };
+        copieLinks.push(copieLink);
+    }
+    return copieLinks;
+}
+
+function byIndexLinksCopyNode(copiedLinks, node_id) {
+
+    let index_array = [];
+    let i = 0;
+    for (i = 0; i < copiedLinks.length; i++) {
+        if (copiedLinks[i].source.id == node_id || copiedLinks[i].target.id == node_id) {
+            index_array.push(copiedLinks[i].source.id - 1);
+            index_array.push(copiedLinks[i].target.id - 1);
+        }
+    }
+
+    let uniqueIndexArray = [...new Set(index_array)];
+    const copiedNodes = uniqueIndexArray.map(index => ({ ...nodes[index] }));
+    return copiedNodes;
+}
+
+function byIndexLinksCopyNode2(copiedLinks) {
+    // 使用map方法复制指定下标的节点数组
+    let index_array = [];
+    let i = 0;
+    for (i = 0; i < copiedLinks.length; i++) {
+        index_array.push(copiedLinks[i].source.id - 1);
+        index_array.push(copiedLinks[i].target.id - 1);
+    }
+    // 使用Set进行去重
+    let uniqueIndexArray = [...new Set(index_array)];
+    const copiedNodes = uniqueIndexArray.map(index => ({ ...nodes[index] }));
+    return copiedNodes;
+}
+// 通过获取的结点的idcopy
+function byIndexLinksCopyNode3(uniquePathsValues) {
+    // 使用map方法复制指定下标的节点数组
+    let index_array = [];
+    let i = 0;
+    for (i = 0; i < uniquePathsValues.length; i++) {
+        index_array.push(nodes[uniquePathsValues[i] - 1]);
+        // index_array.push(copiedLinks[i].target.id - 1);
+    }
+    // 使用Set进行去重
+    // let uniqueIndexArray = [...new Set(index_array)];
+    // const copiedNodes = uniqueIndexArray.map(index => ({ ...nodes[index] }));
+    return index_array;
+}
+// node-detail-container
+var searchIcon = document.querySelector('.icon-search');
+var searchInput = document.querySelector('.search-box input');
+
+// 点击搜索图标或按下 Enter 键时获取输入框的值
+
+function createForceSimulation(nodes, links, centerX, centerY) {
+    // 创建力导向模拟
+    const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).distance(10))
+        .force("collide", d3.forceCollide(40))
+        .force("center", d3.forceCenter(centerX, centerY));
+
+    return simulation;
+}
+
+function updateAndRestartSimulation(nodes, links, centerX, centerY, simulation) {
+    // simulation.stop();
+    simulation = createForceSimulation(nodes, links, centerX, centerY);
+
+    simulation.stop();
+    simulation.nodes(nodes);
+    simulation.force("link").links(links);
+    simulation.alpha(1).restart();
+    return simulation;
+    // // 停止当前的力导向模拟
+    // simulation.stop();
+
+    // // 更新节点和边的数据
+    // simulation.nodes(nodes);
+    // simulation.force("link").links(links);
+
+    // // 重新启动力导向模拟，并让节点重新排列以适应新的数据
+    // simulation.alpha(1).restart();
+}
+
+var copied_nodes;
+var copied_links;
+var centerX1 = 700 / 2;//800
+var centerY1 = 750 / 2;//600
+var centerX2 = 700 / 2;//800
+var centerY2 = 750 / 2;//600
+var centerX3 = 800 / 2;//800
+var centerY3 = 600 / 2;//600
+// let searchSimulation = createForceSimulation(copied_nodes, copied_links, centerX1, centerY1);
+// let searchSimulation2 = createForceSimulation(copied_nodes, copied_links, centerX2, centerY2);
+let searchSimulation3 = createForceSimulation(copied_nodes, copied_links, centerX3, centerY3);
+function handleSearch() {
+    if (simulation) {
+        simulation.stop();
+    }
+
+    var graphElement = document.getElementById('searchgraph');
+    if (graphElement) {
+        // 如果存在 id 为 searchgraph2 的元素
+        // while (graphElement.firstChild) {
+        graphElement.parentNode.removeChild(graphElement);
+        // }
+    }
+
+    var graphElement2 = document.getElementById('searchgraph2');
+    if (graphElement2) {
+        graphElement2.parentNode.removeChild(graphElement2);
+    }
+
+    var graphElement3 = document.getElementById('searchgraph3');
+    if (graphElement3) {
+        graphElement3.parentNode.removeChild(graphElement3);
+    }
+    var inputValue = searchInput.value;
+    let node_id = byNodeNameFindId(inputValue); //ok
+    let index_array = [];
+    let index_array2 = [];
+
+    var index1 = inputValue.indexOf(",");
+    var index2 = inputValue.indexOf("，");
+    var index3 = inputValue.indexOf(" ");
+    console.log("index1 = " + index1);
+    console.log("index2 = " + index2);
+    console.log("index3 = " + index3);
+    if (node_id == -1) {
+        if (index1 == -1 && index2 == -1 && index3 === -1) {// 三个都没找到
+            searchInput.value = "没有找到相关内容1";
+            location.reload();
+            return;
+        }
+        // searchInput.value = "没有找到相关内容";
+        // return;
+    }
+    else {
+        d3.select("#graph")
+            .style("opacity", 0); // 设置 #graph 元素及其包含的所有内容为透明
+        index_array = byIdFindEdgesRelationNode(node_id); // ok
+
+
+        // 图1
+        const copied_links = byIndexLinksCopyLink(index_array); //id 是1，6，7，16，24
+        const copied_nodes = byIndexLinksCopyNode(copied_links, node_id);
+        console.log("copied_links");
+        copied_links.forEach(link => {
+            console.log(link);
+        });
+
+        console.log("copied_nodes");
+        copied_nodes.forEach(link => {
+            console.log(link);
+        });
+        // if (searchSimulation) {
+        //     searchSimulation.stop();
+        // }
+
+        var searchgraphElement = document.querySelector("#searchgraph");
+        if (searchgraphElement) {
+            searchgraphElement.parentNode.removeChild(searchgraphElement);
+        }
+
+        searchgraphElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        searchgraphElement.setAttribute("id", "searchgraph");
+        document.body.appendChild(searchgraphElement);
+
+        const svgWidth = 700;
+        const svgHeight = 760;
+        searchgraphElement.addEventListener('click', function () {
+
+            const sectionToRemove1 = document.querySelector(".netLinkInfo-box");
+            // 2 检查是否存在需要删除的<section>元素
+            if (sectionToRemove1) {
+                // 选择该元素的父节点，并调用removeChild()方法将其从DOM中移除
+                sectionToRemove1.parentNode.removeChild(sectionToRemove1);
+            }
+
+        });
+        searchgraphElement.addEventListener('dblclick', function () {
+            // 处理双击事件的逻辑
+            location.reload();
+        });
+
+        d3.select("#searchgraph")
+            .style("display", "block");
+
+        d3.select("#searchgraph").append("defs").append("marker")
+            .attr("id", "searcharrowhead")
+            .attr("viewBox", "-10 -10 20 20")
+            .attr("refX", 100)
+            .attr("refY", 0)
+            .attr("markerWidth", 15)
+            .attr("markerHeight", 15)
+            // 当orient属性设置为auto时，SVG元素（例如箭头标记）
+            // 会根据其所连接的路径或线段的方向自动调整其朝向。这意味着箭头标记将根据路径的走向自动旋转
+            // ，以确保箭头指向路径的终点。
+            .attr("orient", "auto")
+            .append("path")
+            .attr("fill", "none")
+            .attr("stroke", "azure")
+            .attr("d", "M2,-6 L8,0 L2,6");
+        // 计算图形的中心位置
+        // var centerX = 700 / 2;//800
+        // var centerY = 750 / 2;//600
+        // searchSimulation
+        //     .force("link", null) // 移除旧的 link 力模型
+        //     .force("link", d3.forceLink(copied_links).id(d => "search-" + d.id).distance(10)) // 添加新的 link 力模型
+        // searchSimulation = d3.forceSimulation(copied_nodes)
+        //     .force("link", null) // 移除旧的 link 力模型
+        //     .force("link", d3.forceLink(copied_links).id(d => "search-" + d.id).distance(10)) // 添加新的 link 力模型
+        //     .force("collide", d3.forceCollide(40)) // 避免节点的重叠
+        //     // .force("charge", d3.forceManyBody().strength(0)) // 部分线相交
+        //     .force("center", d3.forceCenter(centerX1, centerY1));  // 将中心设置为图形的中心位置
+
+        let searchSimulation;// = createForceSimulation(copied_nodes, copied_links, centerX1, centerY1);
+        // let searchSimulation2 = createForceSimulation(copied_nodes, copied_links, centerX2, centerY2);
+        searchSimulation = updateAndRestartSimulation(copied_nodes, copied_links, centerX1, centerY1, searchSimulation);
+        // restartSimulation(searchSimulation);
+
+        // searchSimulation.nodes(copied_nodes);
+        // searchSimulation.force("link", d3.forceLink(copied_links).id(d => "search-" + d.id).distance(50));
+        // searchSimulation.force("collide", d3.forceCollide(60))
+        //     .force("charge", d3.forceManyBody().strength(10))
+        //     .force("center", d3.forceCenter(centerX, centerY));
+        // searchSimulation.alpha(1).restart();
+
+
+
+
+        // 创建节点选择集并绑定数据
+        // 构造相关的边和相关的结点
+        const search_node = d3.select("#searchgraph").selectAll(".node")
+            .data(copied_nodes)
+            .enter()
+            .append("g")
+            .attr("id", function (d) {
+                // console.log(d.id);
+                return "search-" + d.id;
+            })
+            .on('click', function (d) {
+                //  通过d获取数组值
+                const data = d3.select(this).datum();
+
+                var nodeContainer = document.getElementsByClassName('node-container')[0];
+                const circleDetail = document.querySelector('.circle-detail');
+                const title = circleDetail.querySelector('a.title');
+                const content = document.querySelector('.content');
+
+                const b = document.createElement('b');
+                const p = document.createElement('p');
+
+                p.appendChild(b);
+
+                aText = data.name;//d.name
+                bText = data.name;//d.name
+                pText = data.details;//d.detail
+                //点击事件圆环ID
+                const circleId = data.id;
+                const gElement = document.getElementById(circleId);
+                const foreignObject = gElement.querySelector("foreignObject");
+                if (nodeContainer.classList.contains('hide')) {
+                    nodeContainer.classList.remove('hide');
+                    nodeContainer.classList.add('active');
+                    title.innerHTML = aText;
+                    p.innerHTML = "<b>" + bText + "</b>" + pText;
+                    content.appendChild(p);
+
+
+
+                    foreignObject.style.display = "block";
+
+                } else if (nodeContainer.classList.contains('active')) {
+                    nodeContainer.classList.remove('active');
+                    nodeContainer.classList.add('hide');
+                    content.innerHTML = '';
+                    foreignObject.style.display = "none";
+                }
+                //分区
+                // 创建<div class="circle-3">元素
+                // removeElementsByClass('circle-3');
+                const circleContainer = document.querySelector('.circle-3');
+                circleContainer.innerHTML = '';
+                // circleContainer.className = 'circle-3';
+
+                // 创建<ul class="circle-name-list">元素
+                const ulElement = document.createElement('ul');
+                ulElement.className = 'circle-name-list';
+
+                event.stopPropagation();
+
+                // 创建<li>元素并设置属性和样式
+                const items = [];
+                items.length = 0;
+                console.log(data.id);
+                const relationsArray1 = nodesContain[data.id - 1].relations;
+                const relationsArrayTitle = nodesContain[data.id - 1].title;
+                let step1 = 90 / (relationsArray1.length);
+                let origindeg1 = 90 - 90 / ((relationsArray1.length) * 2);
+                for (let i = 0; i < relationsArray1.length; i++) {
+                    const dataId0 = relationsArray1[i];
+                    const rota = origindeg1 - step1 * i;
+
+                    // const rotate = "" + rota;
+                    const title = relationsArrayTitle[i];//-90
+                    //-90
+                    const transform0 = "-" + rota + "deg";//-90;//-90
+                    items.push({ dataId: dataId0, title: title, transform: transform0 });
+
+                }
+                items.forEach(item => {
+                    const liElement = document.createElement('li');
+                    liElement.className = `circle-item circle-3-${items.indexOf(item)}`;
+                    liElement.setAttribute('data-id', item.dataId);
+                    liElement.style.transform = `rotate(${item.transform})`;
+                    liElement.style.display = 'none';
+
+                    const spanElement = document.createElement('span');
+                    spanElement.className = 'title';
+                    spanElement.textContent = item.title;
+
+                    liElement.appendChild(spanElement);
+                    ulElement.appendChild(liElement);
+                });
+
+                // 将<ul>元素添加到<div class="circle-3">元素中
+                circleContainer.appendChild(ulElement);
+
+                circle3List = ulElement;
+
+                const circleContainer2 = document.querySelector('.circle-2');
+                // circleContainer2.className = 'circle-2';
+                circleContainer2.innerHTML = '';
+
+                // 创建<ul class="circle-list">元素
+                const ulElement2 = document.createElement('ul');
+                ulElement2.className = 'circle-list';
+
+                // 创建<li>元素并设置属性和样式
+                const items2 = [];
+                items2.length = 0;
+                console.log(data.id);
+                const relationsArray = nodesContain[data.id - 1].relations;
+                let step2 = 90 / (relationsArray.length);
+                let origindeg = 90;
+                for (let i = 0; i < relationsArray.length; i++) {
+                    const dataId = relationsArray[i];
+                    const rota = origindeg - step2 * i;
+
+                    const rotate = "" + rota;
+                    const transform = "-" + rota + "deg";//-90
+                    //-90
+                    const titleClass = relationsArray[i];//-90
+                    items2.push({ dataId: dataId, transform: transform, rotate: rotate, titleClass: titleClass });
+
+                }
+                const rotete3 = 90 / (relationsArray.length * 2) - 2.46;
+                items2.forEach(item => {
+                    const liElement2 = document.createElement('li');
+                    liElement2.className = `circle-item circle-2-${items2.indexOf(item)}`;
+                    liElement2.setAttribute('data-id', item.dataId);
+                    liElement2.style.transform = `rotate(${item.transform})`;
+                    liElement2.setAttribute('data-rotate', item.rotate);
+
+                    const spanElement2 = document.createElement('span');
+                    spanElement2.className = `title ${item.titleClass}`;
+                    spanElement2.style.transform = 'rotate(' + rotete3 + 'deg)';
+
+                    liElement2.appendChild(spanElement2);
+                    ulElement2.appendChild(liElement2);
+
+                    liElement2.addEventListener('mouseover', function () {
+                        // 在这里添加鼠标移动到上面的点击事件的处理逻辑
+                        const liClass = liElement2.getAttribute('class');
+                        const splitArray = liClass.split("-");
+                        const lastElement = splitArray.pop();
+                        console.log(lastElement);
+                        console.log(liClass);
+                        const t = `.circle-item.circle-3-${lastElement}`;
+                        if (circle3List) {
+                            // 例如，你可以获取其中的第一个子元素
+                            const firstItem = circle3List.querySelector(t);
+                            console.log('鼠标移动到上面的点击事件被触发');
+                            console.log(t);
+                            console.log(firstItem);
+                            firstItem.style.display = 'list-item';
+                        }
+                    });
+                    liElement2.addEventListener('mouseout', function () {
+                        // 在这里添加鼠标移动到上面的点击事件的处理逻辑
+                        const liClass = liElement2.getAttribute('class');
+                        const splitArray = liClass.split("-");
+                        const lastElement = splitArray.pop();
+                        console.log(lastElement);
+                        console.log(liClass);
+                        const t = `.circle-item.circle-3-${lastElement}`;
+                        if (circle3List) {
+                            // 例如，你可以获取其中的第一个子元素
+                            const firstItem = circle3List.querySelector(t);
+                            console.log('鼠标移动到上面的点击事件被触发');
+                            console.log(t);
+                            console.log(firstItem);
+                            firstItem.style.display = 'none';
+                        }
+                    });
+                    liElement2.addEventListener('click', function () {
+                        // 获取当前 li 元素的 class 属性值
+                        var currentClassName = liElement2.getAttribute('class');
+
+                        // 判断当前是否已经选中
+                        if (currentClassName.indexOf('selected') === -1) {
+                            // 如果未选中，则添加 selected 类名
+                            liElement2.setAttribute('class', currentClassName + ' selected');
+                        } else {
+                            // 如果已选中，则移除 selected 类名
+                            liElement2.setAttribute('class', currentClassName.replace('selected', '').trim());
+                        }
+                    });
+                });
+                circleContainer2.appendChild(ulElement2);
+            })
+            .attr("class", "node")
+            .raise()
+            .call(searchdrag(searchSimulation));
+
+        // 创建图像元素并插入图片
+        search_node.append("image")
+            .attr("class", "node-image")
+            .attr("x", -20)
+            .attr("y", -20)
+            .attr("xlink:href", d => d.image);
+        // 添加节点标签
+        search_node.append("text")
+            .attr("class", "node-label")
+            .attr("dy", 25)
+            .text(d => d.name);
+
+        search_node.append("foreignObject")
+            .attr("width", 40)
+            .attr("height", 40)
+            .attr("x", -20)
+            .attr("y", -20)
+            .append("xhtml:div") // 在<foreignObject>中添加<div>元素
+            .classed("focus-circle", true)
+            .raise(); // 添加类名
+
+        const center_node = d3.select("#search-" + node_id);
+        const foreignObject = center_node.select("foreignObject");
+        if (!foreignObject.empty()) {
+            foreignObject.style("display", "block");
+        }
+        center_node.select("text.node-label")
+            .style("fill", "lime");
+
+        // const center_div = center_node.append("svg")
+        //     // .attr("class", "focus-circle1")
+        //     .attr("width", "90")
+        //     .attr("height", "90")
+        //     .style("position", "absolute")
+        //     .style("top", "200px")
+        //     .style("left", "200px")
+        //     .style("background", "url(https://static.allhistory.com/online/view/Relation/img/circle.93e1.png) no-repeat 50%")
+        //     .style("background-size", "contain")
+        //     .style("pointer-events", "none")
+        //     .style("transform-origin", "center")
+        //     .style("-webkit-animation", "rotateCircleShow .5s ease, rotateCircle 5s linear .5s infinite")
+        //     .style("animation", "rotateCircleShow .5s ease, rotateCircle 5s linear .5s infinite");
+        // svg是0 * 0
+        //边
+        // const center_image = center_node.select("image");
+        // const center_div = center_node.append("div");
+        // center_div.attr("class", "focus-circle1");
+        // const center_image = center_node.select("image");
+        // const center_div = center_node.append("div");
+        // center_div.attr("class", "focus-circle1");
+        // center_div.raise();
+
+        // 将 center_div 转换为 HTML 字符串
+        // const center_html = new XMLSerializer().serializeToString(center_div.node());
+
+        // 将 HTML 字符串插入到 SVG g 元素之后
+        // center_node.node().insertAdjacentHTML("afterend", center_html);
+        // 创建边选择集并绑定数据
+
+
+        const searchLinkPath = d3.select("#searchgraph").selectAll(".link")
+            .data(copied_links)
+            .enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("marker-end", "url(#searcharrowhead)")
+            .lower()
+            .attr("id", function (d) {
+                console.log(d.id);
+                return "search-" + d.id;
+            })
+            .on("mouseover", function (d) {
+                d3.select(this).style("stroke", "orange"); // 设置线条颜色为橙色
+            })
+            .on("mouseout", function (d) {
+                d3.select(this).style("stroke", ""); // 恢复原来的颜色
+            })
+            .on("click", function (d) {
+                const data = d3.select(this).datum();
+                const linkId = data.id;
+                console.log("data = " + data);
+
+                event.stopPropagation();
+                // 创建<section>元素 from  relation to
+                copied_links.forEach(link => {
+                    console.log("byIdFindArrayIndex2=" + link);
+                })
+                const index = byIdFindArrayIndex2(copied_links, linkId);
+                console.log("index=" + index);
+                const x = byEdgeSourceOrTargetFindNodeID2(copied_nodes, copied_links[index].source.id);
+                const y = byEdgeSourceOrTargetFindNodeID2(copied_nodes, copied_links[index].target.id);
+                // copied_nodes.forEach
+
+                const section = document.createElement("section");
+                console.log("x=" + x);//5
+                console.log("x=" + y);
+
+                if (x >= 0 && x < copied_nodes.length) {
+                    let startX;
+                    let startY;
+                    let endX;
+                    let endY;
+
+                    const elementx = document.getElementById("search-" + copied_nodes[x].id);//通过id获得元素
+                    if (elementx) {
+                        const rect = elementx.getBoundingClientRect();
+                        startX = rect.left + 40 / 2;
+                        startY = rect.top + 40 / 2;//46.6
+                        console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+                    }
+                    const elementy = document.getElementById("search-" + copied_nodes[y].id);
+                    if (elementy) {
+                        const rect = elementy.getBoundingClientRect();
+                        endX = rect.left + 40 / 2;
+                        endY = rect.top + 46.3 / 3;//46.6
+                        console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+                    }
+                    const midX = (startX + endX) / 2 - 160;
+                    const midY = (startY + endY) / 2 + 10;
+
+                    console.log("midX = " + midX + "midY = " + midY);
+
+                    section.setAttribute("class", "netLinkInfo-box panel-relation");
+
+                    section.setAttribute("style", `left: ${midX}px; top: ${midY}px;`);
+                    console.log(`startX: ${midX}, startY: ${midY}`);
+                } else {
+                    console.log("Invalid index for coordinates array");
+                }
+
+                // 创建<div>元素，并添加class和id属性
+                const div = document.createElement("div");
+                div.setAttribute("class", "atobNetLinkInfo-li");
+                div.setAttribute("id", "cad59ab2a99a600018b05dc");
+
+                // 创建关系信息框的标题部分
+                const titleDiv = document.createElement("div");
+                titleDiv.setAttribute("class", "atobNetLinkInfo-title");
+
+                // 创建第一个人物名称<span>元素，设置title属性和文本内容
+                const name1Span = document.createElement("span");
+                const fromtext = bySourceFindName(copied_links[index].source);//links[index].source id
+                const totext = bySourceFindName(copied_links[index].target);
+
+                name1Span.setAttribute("title", fromtext);
+                name1Span.textContent = fromtext;
+                titleDiv.appendChild(name1Span);
+
+                // 创建关系描述<span>元素
+                const relationDescSpan = document.createElement("span");
+                relationDescSpan.setAttribute("class", "relationDesc");
+
+                // 创建关系描述中的箭头图标<span>元素
+                const rightIconSpan = document.createElement("span");
+                rightIconSpan.setAttribute("class", "right-icon");
+
+                // 创建关系描述中的文本<span>元素
+                const descTextSpan = document.createElement("span");
+                const relationtext = copied_links[index].description;
+                descTextSpan.setAttribute("class", "desc-text");
+                descTextSpan.textContent = relationtext;
+                // 将箭头图标和文本元素添加到关系描述<span>元素中
+                // relationDescSpan.appendChild(leftIconSpan);
+                relationDescSpan.appendChild(rightIconSpan);
+                relationDescSpan.appendChild(descTextSpan);
+                // 将关系描述<span>元素添加到标题部分<div>元素中
+                titleDiv.appendChild(relationDescSpan);
+
+                // 创建第二个人物名称<span>元素，设置title属性和文本内容
+                const name2Span = document.createElement("span");
+                name2Span.setAttribute("title", totext);
+                name2Span.textContent = totext;
+                titleDiv.appendChild(name2Span);
+
+                // 将标题部分<div>元素添加到关系信息框<div>元素中
+                div.appendChild(titleDiv);
+
+                // 创建关系信息框的内容部分<div>元素
+                const contentDiv = document.createElement("div");
+                contentDiv.setAttribute("class", "atobNetLinkInfo-content");
+
+                // 创建描述信息<div>元素，并设置文本内容
+                const descriptionDiv = document.createElement("div");
+                descriptionDiv.setAttribute("class", "atobNetLinkInfo-description");
+                descriptionDiv.textContent = copied_links[index].details;
+                // 将描述信息<div>元素添加到内容部分<div>元素中
+                contentDiv.appendChild(descriptionDiv);
+
+                // 将标题部分和内容部分添加到关系信息框<div>元素中
+                div.appendChild(titleDiv);
+                div.appendChild(contentDiv);
+
+                // 将关系信息框<div>元素添加到<section>元素中
+                section.appendChild(div);
+
+                // 将整个<section>元素添加到<body>下
+                document.body.appendChild(section);
+                sectionExists = true;
+
+                const width = descTextSpan.offsetWidth;
+                // console.log("Width:", width);
+                const descTextSpanElement = document.querySelector(".desc-text");
+                descTextSpanElement.style.position = "relative";
+                descTextSpanElement.style.top = "-1px";
+
+                descTextSpanElement.style.left = "-50px";
+                const rightIconElement = document.querySelector(".right-icon");
+                rightIconElement.style.position = "relative";
+                rightIconElement.style.top = "3px";
+                event.stopPropagation();
+            })
+            .each(function (d) {
+                // 获取当前线的边界框，并向四周扩展3px
+                const bbox = this.getBBox();
+                d.bbox = {
+                    x: bbox.x - 6,
+                    y: bbox.y - 6,
+                    width: bbox.width + 12,
+                    height: bbox.height + 12
+                };
+            });
+
+        d3.select("body")
+            .on("mousedown", function () {
+                // 选择要删除的<section>元素
+                const sectionToRemove = document.querySelector(".netLinkInfo-box");
+
+                // 检查是否存在需要删除的<section>元素
+                if (sectionToRemove) {
+                    // 选择该元素的父节点，并调用removeChild()方法将其从DOM中移除
+                    sectionToRemove.parentNode.removeChild(sectionToRemove);
+                }
+            });
+
+        const linkGroup = d3.select("#searchgraph").selectAll(".link-group")
+            .data(copied_links)
+            .enter()
+            .append("g")
+            .attr("class", "link-group");
+        const linkRect = linkGroup.append("rect")
+            .attr("class", "link-rect")
+            .attr("rx", 5)
+            .attr("ry", 5);
+        const linkText = linkGroup.append("text")
+            .attr("class", "link-text")
+            .text(d => d.description)
+            .raise();
+
+        searchSimulation.on("tick", search_ticked);
+        // 更新节点、边和文本的位置
+        function search_ticked() {
+            search_node.attr("transform", d => {
+                return `translate(${d.x},${d.y})`;
+            });
+
+            let nodeCoordinates = [];
+            search_node.each(d => {
+                nodeCoordinates[d.id] = { x: d.x, y: d.y };
+            });
+
+            searchLinkPath.attr("d", d => {
+                const sourceCoords = nodeCoordinates[d.source.id];
+                const targetCoords = nodeCoordinates[d.target.id];
+                return `M${sourceCoords.x},${sourceCoords.y}L${targetCoords.x},${targetCoords.y}`;
+            });
+
+            linkGroup.attr("transform", d => {
+                const sourceCoords = nodeCoordinates[d.source.id];
+                const targetCoords = nodeCoordinates[d.target.id];
+
+                const dx = targetCoords.x - sourceCoords.x;
+                const dy = targetCoords.y - sourceCoords.y;
+                const x = (sourceCoords.x + targetCoords.x) / 2;
+                const y = (sourceCoords.y + targetCoords.y) / 2;
+                return `translate(${x},${y}) rotate(${Math.atan2(dy, dx) * 180 / Math.PI})`;
+            });
+            linkRect.each(function (d) {
+                const bbox = this.getBBox();
+                const padding = 10;
+                const text = d3.select(this.parentNode).select(".link-text").node();
+                const textWidth = text ? text.getBBox().width : 0;
+                const textHeight = text ? text.getBBox().height : 0;
+                d3.select(this)
+                    .attr("width", textWidth + padding)
+                    .attr("height", bbox.height)
+                    .attr("x", -textWidth / 2 - padding / 2)
+                    .attr("y", -bbox.height / 2 + padding / 32);
+                if (text) {
+                    d3.select(text)
+                        .attr("x", -textWidth / 2)
+                        .attr("y", textHeight / 64 + 2); // 调整文本的垂直位置为矩形框的64分之一处
+                }
+            });
+        }
+
+        // 定义拖动行为
+        function searchdrag(searchSimulation) {
+
+            // 开始拖动
+            function dragstarted(event) {
+                if (!event.active) searchSimulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+
+            }
+
+            // 拖动中
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+
+            }
+
+            // 结束拖动
+            function dragended(event) {
+                if (!event.active) searchSimulation.alphaTarget(0);
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+
+            }
+
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
+        }
+
+        // force.strength(0);
+        // const center_node
+
+
+        // 图2
+        index_array2 = byIdFindEdgesRelationNode2(node_id); // ok
+        const copied_links2 = byIndexLinksCopyLink(index_array2); //id 是1，6，7，16，24
+        const copied_nodes2 = byIndexLinksCopyNode2(copied_links2);
+        console.log("copied_links2");
+        copied_links2.forEach(link => {
+            console.log(link);
+        });
+
+        console.log("copied_nodes2");
+        copied_nodes2.forEach(link => {
+            console.log(link);
+        });
+
+
+        var searchgraphElement2 = document.querySelector("#searchgraph2");
+        if (searchgraphElement2) {
+            searchgraphElement2.innerHTML = "";
+            searchgraphElement2.parentNode.removeChild(searchgraphElement2);
+
+        }
+        // if (searchSimulation2) {
+        //     searchSimulation2.stop();
+        // }
+
+        searchgraphElement2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        searchgraphElement2.setAttribute("id", "searchgraph2");
+        document.body.appendChild(searchgraphElement2);
+        searchgraphElement2.addEventListener('click', function () {
+
+            const sectionToRemove2 = document.querySelector(".netLinkInfo-box");
+            // 2 检查是否存在需要删除的<section>元素
+            if (sectionToRemove2) {
+                // 选择该元素的父节点，并调用removeChild()方法将其从DOM中移除
+                sectionToRemove2.parentNode.removeChild(sectionToRemove2);
+            }
+
+        });
+        searchgraphElement2.addEventListener('dblclick', function () {
+            // 处理双击事件的逻辑
+            location.reload();
+        });
+
+        d3.select("#searchgraph2")
+            .style("display", "block");
+
+        d3.select("#searchgraph2").append("defs").append("marker")
+            .attr("id", "searcharrowhead2")
+            .attr("viewBox", " 0 0 20 20")
+            .attr("refX", 100)
+            .attr("refY", 0)
+            .attr("markerWidth", 15)
+            .attr("markerHeight", 15)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("fill", "none")
+            .attr("stroke", "azure")
+            .attr("d", "M2,-6 L8,0 L2,6");
+        // let searchSimulation = createForceSimulation(copied_nodes, copied_links, centerX1, centerY1);
+        let searchSimulation2;// = createForceSimulation(copied_nodes2, copied_links2, centerX2, centerY2);
+
+        searchSimulation2 = updateAndRestartSimulation(copied_nodes2, copied_links2, centerX2, centerY2, searchSimulation2);
+        // restartSimulation(searchSimulation2);
+
+        // updateAndRestartSimulation(copied_nodes2, copied_links2, searchSimulation2);
+        // 创建节点选择集并绑定数据
+        // 构造相关的边和相关的结点
+        const search_node2 = d3.select("#searchgraph2").selectAll(".node")
+            .data(copied_nodes2)
+            .enter()
+            .append("g")
+            .attr("id", function (d) {
+                // console.log(d.id);
+                return "search2-" + d.id;
+            })
+            .attr("transform", function (d) {
+                const x = (d.x % 600 + 600) % 600;
+                const y = (d.y % 700 + 700) % 700
+                return "translate(" + (x) + ", " + (y) + ")";
+            })
+            .on('click', function (d) {
+                //  通过d获取数组值
+                const data = d3.select(this).datum();
+
+                var nodeContainer = document.getElementsByClassName('node-container')[0];
+                const circleDetail = document.querySelector('.circle-detail');
+                const title = circleDetail.querySelector('a.title');
+                const content = document.querySelector('.content');
+
+                const b = document.createElement('b');
+                const p = document.createElement('p');
+
+                p.appendChild(b);
+
+                aText = data.name;//d.name
+                bText = data.name;//d.name
+                pText = data.details;//d.detail
+                //点击事件圆环ID
+                const circleId = data.id;
+                const gElement = document.getElementById(circleId);
+                const foreignObject = gElement.querySelector("foreignObject");
+                if (nodeContainer.classList.contains('hide')) {
+                    nodeContainer.classList.remove('hide');
+                    nodeContainer.classList.add('active');
+                    title.innerHTML = aText;
+                    p.innerHTML = "<b>" + bText + "</b>" + pText;
+                    content.appendChild(p);
+
+
+
+                    foreignObject.style.display = "block";
+
+                } else if (nodeContainer.classList.contains('active')) {
+                    nodeContainer.classList.remove('active');
+                    nodeContainer.classList.add('hide');
+                    content.innerHTML = '';
+                    foreignObject.style.display = "none";
+                }
+                //分区
+                // 创建<div class="circle-3">元素
+                // removeElementsByClass('circle-3');
+                const circleContainer = document.querySelector('.circle-3');
+                circleContainer.innerHTML = '';
+                // circleContainer.className = 'circle-3';
+
+                // 创建<ul class="circle-name-list">元素
+                const ulElement = document.createElement('ul');
+                ulElement.className = 'circle-name-list';
+
+                event.stopPropagation();
+
+                // 创建<li>元素并设置属性和样式
+                const items = [];
+                items.length = 0;
+                console.log(data.id);
+                const relationsArray1 = nodesContain[data.id - 1].relations;
+                const relationsArrayTitle = nodesContain[data.id - 1].title;
+                let step1 = 90 / (relationsArray1.length);
+                let origindeg1 = 90 - 90 / ((relationsArray1.length) * 2);
+                for (let i = 0; i < relationsArray1.length; i++) {
+                    const dataId0 = relationsArray1[i];
+                    const rota = origindeg1 - step1 * i;
+
+                    // const rotate = "" + rota;
+                    const title = relationsArrayTitle[i];//-90
+                    //-90
+                    const transform0 = "-" + rota + "deg";//-90;//-90
+                    items.push({ dataId: dataId0, title: title, transform: transform0 });
+
+                }
+                items.forEach(item => {
+                    const liElement = document.createElement('li');
+                    liElement.className = `circle-item circle-3-${items.indexOf(item)}`;
+                    liElement.setAttribute('data-id', item.dataId);
+                    liElement.style.transform = `rotate(${item.transform})`;
+                    liElement.style.display = 'none';
+
+                    const spanElement = document.createElement('span');
+                    spanElement.className = 'title';
+                    spanElement.textContent = item.title;
+
+                    liElement.appendChild(spanElement);
+                    ulElement.appendChild(liElement);
+                });
+
+                // 将<ul>元素添加到<div class="circle-3">元素中
+                circleContainer.appendChild(ulElement);
+
+                circle3List = ulElement;
+
+                const circleContainer2 = document.querySelector('.circle-2');
+                // circleContainer2.className = 'circle-2';
+                circleContainer2.innerHTML = '';
+
+                // 创建<ul class="circle-list">元素
+                const ulElement2 = document.createElement('ul');
+                ulElement2.className = 'circle-list';
+
+                // 创建<li>元素并设置属性和样式
+                const items2 = [];
+                items2.length = 0;
+                console.log(data.id);
+                const relationsArray = nodesContain[data.id - 1].relations;
+                let step2 = 90 / (relationsArray.length);
+                let origindeg = 90;
+                for (let i = 0; i < relationsArray.length; i++) {
+                    const dataId = relationsArray[i];
+                    const rota = origindeg - step2 * i;
+
+                    const rotate = "" + rota;
+                    const transform = "-" + rota + "deg";//-90
+                    //-90
+                    const titleClass = relationsArray[i];//-90
+                    items2.push({ dataId: dataId, transform: transform, rotate: rotate, titleClass: titleClass });
+
+                }
+                const rotete3 = 90 / (relationsArray.length * 2) - 2.46;
+                items2.forEach(item => {
+                    const liElement2 = document.createElement('li');
+                    liElement2.className = `circle-item circle-2-${items2.indexOf(item)}`;
+                    liElement2.setAttribute('data-id', item.dataId);
+                    liElement2.style.transform = `rotate(${item.transform})`;
+                    liElement2.setAttribute('data-rotate', item.rotate);
+
+                    const spanElement2 = document.createElement('span');
+                    spanElement2.className = `title ${item.titleClass}`;
+                    spanElement2.style.transform = 'rotate(' + rotete3 + 'deg)';
+
+                    liElement2.appendChild(spanElement2);
+                    ulElement2.appendChild(liElement2);
+
+                    liElement2.addEventListener('mouseover', function () {
+                        // 在这里添加鼠标移动到上面的点击事件的处理逻辑
+                        const liClass = liElement2.getAttribute('class');
+                        const splitArray = liClass.split("-");
+                        const lastElement = splitArray.pop();
+                        console.log(lastElement);
+                        console.log(liClass);
+                        const t = `.circle-item.circle-3-${lastElement}`;
+                        if (circle3List) {
+                            // 例如，你可以获取其中的第一个子元素
+                            const firstItem = circle3List.querySelector(t);
+                            console.log('鼠标移动到上面的点击事件被触发');
+                            console.log(t);
+                            console.log(firstItem);
+                            firstItem.style.display = 'list-item';
+                        }
+                    });
+                    liElement2.addEventListener('mouseout', function () {
+                        // 在这里添加鼠标移动到上面的点击事件的处理逻辑
+                        const liClass = liElement2.getAttribute('class');
+                        const splitArray = liClass.split("-");
+                        const lastElement = splitArray.pop();
+                        console.log(lastElement);
+                        console.log(liClass);
+                        const t = `.circle-item.circle-3-${lastElement}`;
+                        if (circle3List) {
+                            // 例如，你可以获取其中的第一个子元素
+                            const firstItem = circle3List.querySelector(t);
+                            console.log('鼠标移动到上面的点击事件被触发');
+                            console.log(t);
+                            console.log(firstItem);
+                            firstItem.style.display = 'none';
+                        }
+                    });
+                    liElement2.addEventListener('click', function () {
+                        // 获取当前 li 元素的 class 属性值
+                        var currentClassName = liElement2.getAttribute('class');
+
+                        // 判断当前是否已经选中
+                        if (currentClassName.indexOf('selected') === -1) {
+                            // 如果未选中，则添加 selected 类名
+                            liElement2.setAttribute('class', currentClassName + ' selected');
+                        } else {
+                            // 如果已选中，则移除 selected 类名
+                            liElement2.setAttribute('class', currentClassName.replace('selected', '').trim());
+                        }
+                    });
+                });
+                circleContainer2.appendChild(ulElement2);
+            })
+            .attr("class", "node")
+            .raise()
+            .call(searchdrag2(searchSimulation2));
+
+        // 创建图像元素并插入图片
+        search_node2.append("image")
+            .attr("class", "node-image")
+            .attr("x", -20)
+            .attr("y", -20)
+            .attr("xlink:href", d => d.image);
+        // 添加节点标签
+        search_node2.append("text")
+            .attr("class", "node-label")
+            .attr("dy", 25)
+            .text(d => d.name);
+
+        search_node2.append("foreignObject")
+            .attr("width", 40)
+            .attr("height", 40)
+            .attr("x", -20)
+            .attr("y", -20)
+            .append("xhtml:div") // 在<foreignObject>中添加<div>元素
+            .classed("focus-circle", true)
+            .raise(); // 添加类名
+
+        const center_node2 = d3.select("#search2-" + node_id);
+        const foreignObject2 = center_node2.select("foreignObject");
+        if (!foreignObject2.empty()) {
+            foreignObject2.style("display", "block");
+        }
+        center_node2.select("text.node-label")
+            .style("fill", "lime");
+        //边
+        // 创建边选择集并绑定数据
+        const searchLinkPath2 = d3.select("#searchgraph2").selectAll(".link")
+            .data(copied_links2)
+            .enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("marker-end", "url(#searcharrowhead2)")
+            .lower()
+            .attr("id", function (d) {
+                // console.log(d.id);
+                return "search-" + d.id;
+            })
+            .on("mouseover", function (d) {
+                d3.select(this).style("stroke", "orange"); // 设置线条颜色为橙色
+            })
+            .on("mouseout", function (d) {
+                d3.select(this).style("stroke", ""); // 恢复原来的颜色
+            })
+            .on("click", function (d) {
+                const data = d3.select(this).datum();
+                const linkId = data.id;
+                console.log("data = " + data);
+
+                event.stopPropagation();
+                // 创建<section>元素 from  relation to
+                copied_links2.forEach(link => {
+                    console.log("byIdFindArrayIndex2=" + link);
+                })
+                const index = byIdFindArrayIndex2(copied_links2, linkId);
+                console.log("index=" + index);
+                const x = byEdgeSourceOrTargetFindNodeID2(copied_nodes2, copied_links2[index].source.id);
+                const y = byEdgeSourceOrTargetFindNodeID2(copied_nodes2, copied_links2[index].target.id);
+                // copied_nodes.forEach
+
+                const section = document.createElement("section");
+                console.log("x=" + x);//5
+                console.log("x=" + y);
+
+                if (x >= 0 && x < copied_nodes2.length) {
+                    let startX;
+                    let startY;
+                    let endX;
+                    let endY;
+
+                    const elementx = document.getElementById("search-" + copied_nodes2[x].id);//通过id获得元素
+                    if (elementx) {
+                        const rect = elementx.getBoundingClientRect();
+                        startX = rect.left + 40 / 2;
+                        startY = rect.top + 40 / 2;//46.6
+                        console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+                    }
+                    const elementy = document.getElementById("search-" + copied_nodes2[y].id);
+                    if (elementy) {
+                        const rect = elementy.getBoundingClientRect();
+                        endX = rect.left + 40 / 2;
+                        endY = rect.top + 46.3 / 3;//46.6
+                        console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+                    }
+                    const midX = (startX + endX) / 2 - 160;
+                    const midY = (startY + endY) / 2 + 10;
+
+                    console.log("midX = " + midX + "midY = " + midY);
+
+                    section.setAttribute("class", "netLinkInfo-box panel-relation");
+
+                    section.setAttribute("style", `left: ${midX}px; top: ${midY}px;`);
+                    console.log(`startX: ${midX}, startY: ${midY}`);
+                } else {
+                    console.log("Invalid index for coordinates array");
+                }
+
+                // 创建<div>元素，并添加class和id属性
+                const div = document.createElement("div");
+                div.setAttribute("class", "atobNetLinkInfo-li");
+                div.setAttribute("id", "cad59ab2a99a600018b05dc");
+
+                // 创建关系信息框的标题部分
+                const titleDiv = document.createElement("div");
+                titleDiv.setAttribute("class", "atobNetLinkInfo-title");
+
+                // 创建第一个人物名称<span>元素，设置title属性和文本内容
+                const name1Span = document.createElement("span");
+                const fromtext = bySourceFindName(copied_links2[index].source);//links[index].source id
+                const totext = bySourceFindName(copied_links2[index].target);
+
+                name1Span.setAttribute("title", fromtext);
+                name1Span.textContent = fromtext;
+                titleDiv.appendChild(name1Span);
+
+                // 创建关系描述<span>元素
+                const relationDescSpan = document.createElement("span");
+                relationDescSpan.setAttribute("class", "relationDesc");
+
+                // 创建关系描述中的箭头图标<span>元素
+                const rightIconSpan = document.createElement("span");
+                rightIconSpan.setAttribute("class", "right-icon");
+
+                // 创建关系描述中的文本<span>元素
+                const descTextSpan = document.createElement("span");
+                const relationtext = copied_links2[index].description;
+                descTextSpan.setAttribute("class", "desc-text");
+                descTextSpan.textContent = relationtext;
+                // 将箭头图标和文本元素添加到关系描述<span>元素中
+                // relationDescSpan.appendChild(leftIconSpan);
+                relationDescSpan.appendChild(rightIconSpan);
+                relationDescSpan.appendChild(descTextSpan);
+                // 将关系描述<span>元素添加到标题部分<div>元素中
+                titleDiv.appendChild(relationDescSpan);
+
+                // 创建第二个人物名称<span>元素，设置title属性和文本内容
+                const name2Span = document.createElement("span");
+                name2Span.setAttribute("title", totext);
+                name2Span.textContent = totext;
+                titleDiv.appendChild(name2Span);
+
+                // 将标题部分<div>元素添加到关系信息框<div>元素中
+                div.appendChild(titleDiv);
+
+                // 创建关系信息框的内容部分<div>元素
+                const contentDiv = document.createElement("div");
+                contentDiv.setAttribute("class", "atobNetLinkInfo-content");
+
+                // 创建描述信息<div>元素，并设置文本内容
+                const descriptionDiv = document.createElement("div");
+                descriptionDiv.setAttribute("class", "atobNetLinkInfo-description");
+                descriptionDiv.textContent = copied_links2[index].details;
+                // 将描述信息<div>元素添加到内容部分<div>元素中
+                contentDiv.appendChild(descriptionDiv);
+
+                // 将标题部分和内容部分添加到关系信息框<div>元素中
+                div.appendChild(titleDiv);
+                div.appendChild(contentDiv);
+
+                // 将关系信息框<div>元素添加到<section>元素中
+                section.appendChild(div);
+
+                // 将整个<section>元素添加到<body>下
+                document.body.appendChild(section);
+                sectionExists = true;
+
+                const width = descTextSpan.offsetWidth;
+                // console.log("Width:", width);
+                const descTextSpanElement = document.querySelector(".desc-text");
+                descTextSpanElement.style.position = "relative";
+                descTextSpanElement.style.top = "-1px";
+
+                descTextSpanElement.style.left = "-50px";
+                const rightIconElement = document.querySelector(".right-icon");
+                rightIconElement.style.position = "relative";
+                rightIconElement.style.top = "3px";
+                event.stopPropagation();
+            })
+            .each(function (d) {
+                // 获取当前线的边界框，并向四周扩展3px
+                const bbox = this.getBBox();
+                d.bbox = {
+                    x: bbox.x - 6,
+                    y: bbox.y - 6,
+                    width: bbox.width + 12,
+                    height: bbox.height + 12
+                };
+            });
+
+        d3.select("body")
+            .on("mousedown", function () {
+                // 选择要删除的<section>元素
+                const sectionToRemove = document.querySelector(".netLinkInfo-box");
+
+                // 检查是否存在需要删除的<section>元素
+                if (sectionToRemove) {
+                    // 选择该元素的父节点，并调用removeChild()方法将其从DOM中移除
+                    sectionToRemove.parentNode.removeChild(sectionToRemove);
+                }
+            });
+
+        const linkGroup2 = d3.select("#searchgraph2").selectAll(".link-group")
+            .data(copied_links2)
+            .enter()
+            .append("g")
+            .attr("class", "link-group");
+        const linkRect2 = linkGroup2.append("rect")
+            .attr("class", "link-rect")
+            .attr("rx", 5)
+            .attr("ry", 5);
+        const linkText2 = linkGroup2.append("text")
+            .attr("class", "link-text")
+            .text(d => d.description)
+            .raise();
+
+        searchSimulation2.on("tick", search_ticked2);
+        // 更新节点、边和文本的位置
+        function search_ticked2() {
+            search_node2.attr("transform", d => {
+                // console.log("d.id=" + d.id);
+                // console.log("d.x=" + d.x);
+                // console.log("d.y=" + d.y);
+                return `translate(${d.x},${d.y})`;
+            });
+            // 将节点限制在一个圆周上
+            // search_node.attr("transform", function (d, i) {
+            //     const x = 250 + Math.cos(i / nodes.length * 2 * Math.PI) * 200;
+            //     const y = 250 + Math.sin(i / nodes.length * 2 * Math.PI) * 200;
+
+            //     return `translate(${x},${y})`;;
+            // });
+            let nodeCoordinates = [];
+            search_node2.each(d => {
+                nodeCoordinates[d.id] = { x: d.x, y: d.y };
+            });
+
+            searchLinkPath2.attr("d", d => {
+                const sourceCoords = nodeCoordinates[d.source.id];
+                const targetCoords = nodeCoordinates[d.target.id];
+                return `M${sourceCoords.x},${sourceCoords.y}L${targetCoords.x},${targetCoords.y}`;
+            });
+            // searchLinkPath.attr("x1", function (d) {
+            //     const sourceCoords = nodeCoordinates[d.source.id];
+            //     return sourceCoords.x;
+            // })
+            //     .attr("y1", function (d) {
+            //         const sourceCoords = nodeCoordinates[d.source.id];
+
+
+            //         return sourceCoords.y;
+            //     })
+            //     .attr("x2", function (d) {
+            //         const targetCoords = nodeCoordinates[d.target.id];
+            //         return targetCoords.x;
+            //     })
+            //     .attr("y2", function (d) {
+            //         const targetCoords = nodeCoordinates[d.target.id];
+            //         return targetCoords.y;
+            //     });
+
+
+            linkGroup2.attr("transform", d => {
+                const sourceCoords = nodeCoordinates[d.source.id];
+                const targetCoords = nodeCoordinates[d.target.id];
+
+                const dx = targetCoords.x - sourceCoords.x;
+                const dy = targetCoords.y - sourceCoords.y;
+                const x = (sourceCoords.x + targetCoords.x) / 2;
+                const y = (sourceCoords.y + targetCoords.y) / 2;
+                return `translate(${x},${y}) rotate(${Math.atan2(dy, dx) * 180 / Math.PI})`;
+            });
+            linkRect2.each(function (d) {
+                const bbox = this.getBBox();
+                const padding = 10;
+                const text = d3.select(this.parentNode).select(".link-text").node();
+                const textWidth = text ? text.getBBox().width : 0;
+                const textHeight = text ? text.getBBox().height : 0;
+                d3.select(this)
+                    .attr("width", textWidth + padding)
+                    .attr("height", bbox.height)
+                    .attr("x", -textWidth / 2 - padding / 2)
+                    .attr("y", -bbox.height / 2 + padding / 32);
+                if (text) {
+                    d3.select(text)
+                        .attr("x", -textWidth / 2)
+                        .attr("y", textHeight / 64 + 2); // 调整文本的垂直位置为矩形框的64分之一处
+                }
+            });
+        }
+
+        // 定义拖动行为
+        function searchdrag2(searchSimulation2) {
+
+            // 开始拖动
+            function dragstarted(event) {
+                if (!event.active) searchSimulation2.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+
+            }
+
+            // 拖动中
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+
+            }
+
+            // 结束拖动
+            function dragended(event) {
+                if (!event.active) searchSimulation2.alphaTarget(0);
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
+        }
+        searchInput.value = '';
+    }
+
+
+    console.log("index1 = " + index1);
+    console.log("index2 = " + index2);
+    console.log("index3 = " + index3);
+
+    //图3
+    if (index1 !== -1 || index2 !== -1 || index3 !== -1) {
+        console.log("输入值中包含中英文逗号或空格");
+        // searchInput.value = "two node3";
+        // 存在逗号或空格
+        if (index1 !== -1) {
+            var dataArray = inputValue.split(",");
+        } else if (index2 !== -1) {
+            var dataArray = inputValue.split("，");
+        } else {
+            var dataArray = inputValue.split(" ");
+        }
+        // var dataArray = inputValue.split(/, |，/);
+
+        var firstValue = dataArray[0].trim();
+        var secondValue = dataArray[1].trim();
+
+        let firstValue_id = byNodeNameFindId(firstValue); //ok
+        let secondValue_id = byNodeNameFindId(secondValue); //ok
+
+
+        if (firstValue_id == -1 || secondValue_id == -1) {
+            searchInput.value = "没有找到相关内容3";
+            return;
+        } else {
+            d3.select("#graph")
+                .style("opacity", 0); // 设置 #graph 元素及其包含的所有内容为透明
+            // .on("click", null);
+            // 通过 当前的 id 在links中查找相关的边及其相关的结点
+
+            const startNode = firstValue_id;
+            const endNode = secondValue_id;
+            const paths = findPathsBetweenNodes(startNode, endNode, adjacencyMatrix);
+            console.log("path");
+            console.log(paths);
+
+            index_array = byIdFindEdgesRelationNode(node_id); // ok
+            let uniquePathedge = [];
+            let uniquePathsValues = [];//node
+            for (let i = 0; i < paths.length; i++) {
+                for (let j = 0; j < paths[i].length; j++) {
+                    console.log("paths[i][j]=" + paths[i][j]);
+                    if (!uniquePathsValues.includes(paths[i][j])) {
+                        uniquePathsValues.push(paths[i][j]);
+                    }
+                }
+            }
+            for (let i = 0; i < paths.length; i++) {
+                for (let j = 0; j < paths[i].length - 1; j++) {
+                    console.log("paths[i][j]=" + paths[i][j]);
+                    // paths[i][j]
+                    // paths[i][j + 1]
+                    for (let l = 0; l < links.length; l++) {
+                        if (links[l].source.id == paths[i][j] && (links[l].target.id == paths[i][j + 1])) {
+                            if (!uniquePathedge.includes(l)) {
+                                uniquePathedge.push(l);
+                                // index_array.push(k);
+                            }
+                        }
+                    }
+                }
+            }
+            console.log("uniquePathsValues");
+            console.log(uniquePathsValues);
+            const copied_links3 = byIndexLinksCopyLink(uniquePathedge); //id 是1，6，7，16，24
+            const copied_nodes3 = byIndexLinksCopyNode3(uniquePathsValues);
+
+
+            var searchgraphElement3 = document.querySelector("#searchgraph3");
+            if (searchgraphElement3) {
+                searchgraphElement3.innerHTML = "";
+                searchgraphElement3.parentNode.removeChild(searchgraphElement3);
+            }
+            searchgraphElement3 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            searchgraphElement3.setAttribute("id", "searchgraph3");
+            document.body.appendChild(searchgraphElement3);
+
+            searchgraphElement3.addEventListener('click', function () {
+
+                const sectionToRemove1 = document.querySelector(".netLinkInfo-box");
+                // 2 检查是否存在需要删除的<section>元素
+                if (sectionToRemove1) {
+                    // 选择该元素的父节点，并调用removeChild()方法将其从DOM中移除
+                    sectionToRemove1.parentNode.removeChild(sectionToRemove1);
+                }
+
+            });
+            searchgraphElement3.addEventListener('dblclick', function () {
+                // 处理双击事件的逻辑
+                location.reload();
+            });
+
+            d3.select("#searchgraph3")
+                .style("display", "block");
+
+            d3.select("#searchgraph3").append("defs").append("marker")
+                .attr("id", "searcharrowhead3")
+                .attr("viewBox", "-10 -10 20 20")
+                .attr("refX", 100)
+                .attr("refY", 0)
+                .attr("markerWidth", 15)
+                .attr("markerHeight", 15)
+                // 当orient属性设置为auto时，SVG元素（例如箭头标记）
+                // 会根据其所连接的路径或线段的方向自动调整其朝向。这意味着箭头标记将根据路径的走向自动旋转
+                // ，以确保箭头指向路径的终点。
+                .attr("orient", "auto")
+                .append("path")
+                .attr("fill", "none")
+                .attr("stroke", "azure")
+                .attr("d", "M2,-6 L8,0 L2,6");
+
+            // 设置SVG元素的位置
+            // svg.style("position", "absolute")
+            //     .style("left", 0 + "px")
+            //     .style("top", 0 + "px")
+
+            // 计算图形的中心位置
+
+            // searchSimulation3 = d3.forceSimulation(copied_nodes3)
+            //     .force("link", d3.forceLink(copied_links3).id(d => "search3-" + d.id).distance(0))
+            //     .force("collide", d3.forceCollide(60)) // 避免节点的重叠
+            //     .force("charge", d3.forceManyBody().strength(10)) // 部分线相交
+            //     .force("center", d3.forceCenter(centerX3, centerY3));  // 将中心设置为图形的中心位置
+            // .force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+            // searchSimulation3.force("link", d3.forceLink(copied_links3).id(d => "search3-" + d.id).distance(50));
+            searchSimulation3 = updateAndRestartSimulation(copied_nodes3, copied_links3, centerX3, centerY3, searchSimulation3);
+            // restartSimulation(searchSimulation3);
+            // updateAndRestartSimulation(copied_nodes3, copied_links3, searchSimulation3);
+
+            // 创建节点选择集并绑定数据
+            // 构造相关的边和相关的结点
+            const search_node3 = d3.select("#searchgraph3").selectAll(".node")
+                .data(copied_nodes3)
+                .enter()
+                .append("g")
+                .attr("id", function (d) {
+                    // console.log(d.id);
+                    return "search3-" + d.id;
+                })
+                .on('click', function (d) {
+                    //  通过d获取数组值
+                    const data = d3.select(this).datum();
+
+                    var nodeContainer = document.getElementsByClassName('node-container')[0];
+                    const circleDetail = document.querySelector('.circle-detail');
+                    const title = circleDetail.querySelector('a.title');
+                    const content = document.querySelector('.content');
+
+                    const b = document.createElement('b');
+                    const p = document.createElement('p');
+
+                    p.appendChild(b);
+
+                    aText = data.name;//d.name
+                    bText = data.name;//d.name
+                    pText = data.details;//d.detail
+                    //点击事件圆环ID
+                    const circleId = data.id;
+                    const gElement = document.getElementById(circleId);
+                    const foreignObject = gElement.querySelector("foreignObject");
+                    if (nodeContainer.classList.contains('hide')) {
+                        nodeContainer.classList.remove('hide');
+                        nodeContainer.classList.add('active');
+                        title.innerHTML = aText;
+                        p.innerHTML = "<b>" + bText + "</b>" + pText;
+                        content.appendChild(p);
+
+
+
+                        foreignObject.style.display = "block";
+
+                    } else if (nodeContainer.classList.contains('active')) {
+                        nodeContainer.classList.remove('active');
+                        nodeContainer.classList.add('hide');
+                        content.innerHTML = '';
+                        foreignObject.style.display = "none";
+                    }
+                    //分区
+                    // 创建<div class="circle-3">元素
+                    // removeElementsByClass('circle-3');
+                    const circleContainer = document.querySelector('.circle-3');
+                    circleContainer.innerHTML = '';
+                    // circleContainer.className = 'circle-3';
+
+                    // 创建<ul class="circle-name-list">元素
+                    const ulElement = document.createElement('ul');
+                    ulElement.className = 'circle-name-list';
+
+                    event.stopPropagation();
+
+                    // 创建<li>元素并设置属性和样式
+                    const items = [];
+                    items.length = 0;
+                    console.log(data.id);
+                    const relationsArray1 = nodesContain[data.id - 1].relations;
+                    const relationsArrayTitle = nodesContain[data.id - 1].title;
+                    let step1 = 90 / (relationsArray1.length);
+                    let origindeg1 = 90 - 90 / ((relationsArray1.length) * 2);
+                    for (let i = 0; i < relationsArray1.length; i++) {
+                        const dataId0 = relationsArray1[i];
+                        const rota = origindeg1 - step1 * i;
+
+                        // const rotate = "" + rota;
+                        const title = relationsArrayTitle[i];//-90
+                        //-90
+                        const transform0 = "-" + rota + "deg";//-90;//-90
+                        items.push({ dataId: dataId0, title: title, transform: transform0 });
+
+                    }
+                    items.forEach(item => {
+                        const liElement = document.createElement('li');
+                        liElement.className = `circle-item circle-3-${items.indexOf(item)}`;
+                        liElement.setAttribute('data-id', item.dataId);
+                        liElement.style.transform = `rotate(${item.transform})`;
+                        liElement.style.display = 'none';
+
+                        const spanElement = document.createElement('span');
+                        spanElement.className = 'title';
+                        spanElement.textContent = item.title;
+
+                        liElement.appendChild(spanElement);
+                        ulElement.appendChild(liElement);
+                    });
+
+                    // 将<ul>元素添加到<div class="circle-3">元素中
+                    circleContainer.appendChild(ulElement);
+
+                    circle3List = ulElement;
+
+                    const circleContainer2 = document.querySelector('.circle-2');
+                    // circleContainer2.className = 'circle-2';
+                    circleContainer2.innerHTML = '';
+
+                    // 创建<ul class="circle-list">元素
+                    const ulElement2 = document.createElement('ul');
+                    ulElement2.className = 'circle-list';
+
+                    // 创建<li>元素并设置属性和样式
+                    const items2 = [];
+                    items2.length = 0;
+                    console.log(data.id);
+                    const relationsArray = nodesContain[data.id - 1].relations;
+                    let step2 = 90 / (relationsArray.length);
+                    let origindeg = 90;
+                    for (let i = 0; i < relationsArray.length; i++) {
+                        const dataId = relationsArray[i];
+                        const rota = origindeg - step2 * i;
+
+                        const rotate = "" + rota;
+                        const transform = "-" + rota + "deg";//-90
+                        //-90
+                        const titleClass = relationsArray[i];//-90
+                        items2.push({ dataId: dataId, transform: transform, rotate: rotate, titleClass: titleClass });
+
+                    }
+                    const rotete3 = 90 / (relationsArray.length * 2) - 2.46;
+                    items2.forEach(item => {
+                        const liElement2 = document.createElement('li');
+                        liElement2.className = `circle-item circle-2-${items2.indexOf(item)}`;
+                        liElement2.setAttribute('data-id', item.dataId);
+                        liElement2.style.transform = `rotate(${item.transform})`;
+                        liElement2.setAttribute('data-rotate', item.rotate);
+
+                        const spanElement2 = document.createElement('span');
+                        spanElement2.className = `title ${item.titleClass}`;
+                        spanElement2.style.transform = 'rotate(' + rotete3 + 'deg)';
+
+                        liElement2.appendChild(spanElement2);
+                        ulElement2.appendChild(liElement2);
+
+                        liElement2.addEventListener('mouseover', function () {
+                            // 在这里添加鼠标移动到上面的点击事件的处理逻辑
+                            const liClass = liElement2.getAttribute('class');
+                            const splitArray = liClass.split("-");
+                            const lastElement = splitArray.pop();
+                            console.log(lastElement);
+                            console.log(liClass);
+                            const t = `.circle-item.circle-3-${lastElement}`;
+                            if (circle3List) {
+                                // 例如，你可以获取其中的第一个子元素
+                                const firstItem = circle3List.querySelector(t);
+                                console.log('鼠标移动到上面的点击事件被触发');
+                                console.log(t);
+                                console.log(firstItem);
+                                firstItem.style.display = 'list-item';
+                            }
+                        });
+                        liElement2.addEventListener('mouseout', function () {
+                            // 在这里添加鼠标移动到上面的点击事件的处理逻辑
+                            const liClass = liElement2.getAttribute('class');
+                            const splitArray = liClass.split("-");
+                            const lastElement = splitArray.pop();
+                            console.log(lastElement);
+                            console.log(liClass);
+                            const t = `.circle-item.circle-3-${lastElement}`;
+                            if (circle3List) {
+                                // 例如，你可以获取其中的第一个子元素
+                                const firstItem = circle3List.querySelector(t);
+                                console.log('鼠标移动到上面的点击事件被触发');
+                                console.log(t);
+                                console.log(firstItem);
+                                firstItem.style.display = 'none';
+                            }
+                        });
+                        liElement2.addEventListener('click', function () {
+                            // 获取当前 li 元素的 class 属性值
+                            var currentClassName = liElement2.getAttribute('class');
+
+                            // 判断当前是否已经选中
+                            if (currentClassName.indexOf('selected') === -1) {
+                                // 如果未选中，则添加 selected 类名
+                                liElement2.setAttribute('class', currentClassName + ' selected');
+                            } else {
+                                // 如果已选中，则移除 selected 类名
+                                liElement2.setAttribute('class', currentClassName.replace('selected', '').trim());
+                            }
+                        });
+                    });
+                    circleContainer2.appendChild(ulElement2);
+                })
+                .attr("class", "node")
+                .raise()
+                .call(searchdrag3(searchSimulation3));
+
+            // 创建图像元素并插入图片
+            search_node3.append("image")
+                .attr("class", "node-image")
+                .attr("x", -20)
+                .attr("y", -20)
+                .attr("xlink:href", d => d.image);
+            // 添加节点标签
+            search_node3.append("text")
+                .attr("class", "node-label")
+                .attr("dy", 25)
+                .text(d => d.name);
+
+            search_node3.append("foreignObject")
+                .attr("width", 40)
+                .attr("height", 40)
+                .attr("x", -20)
+                .attr("y", -20)
+                .append("xhtml:div") // 在<foreignObject>中添加<div>元素
+                .classed("focus-circle", true)
+                .raise(); // 添加类名
+
+
+            const center_node3_1 = d3.select("#search3-" + firstValue_id);
+            const foreignObject3_1 = center_node3_1.select("foreignObject");
+            if (!foreignObject3_1.empty()) {
+                foreignObject3_1.style("display", "block");
+            }
+            center_node3_1.select("text.node-label")
+                .style("fill", "lime");
+
+            const center_node3_2 = d3.select("#search3-" + secondValue_id);
+            const foreignObject3_2 = center_node3_2.select("foreignObject");
+            if (!foreignObject3_2.empty()) {
+                foreignObject3_2.style("display", "block");
+            }
+            center_node3_2.select("text.node-label")
+                .style("fill", "lime");
+            //边
+            // 创建边选择集并绑定数据
+            const searchLinkPath = d3.select("#searchgraph3").selectAll(".link")
+                .data(copied_links3)
+                .enter()
+                .append("path")
+                .attr("class", "link")
+                .attr("marker-end", "url(#searcharrowhead3)")
+                .lower()
+                .attr("id", function (d) {
+                    console.log(d.id);
+                    return "search-" + d.id;
+                })
+                .on("mouseover", function (d) {
+                    d3.select(this).style("stroke", "orange"); // 设置线条颜色为橙色
+                })
+                .on("mouseout", function (d) {
+                    d3.select(this).style("stroke", ""); // 恢复原来的颜色
+                })
+                .on("click", function (d) {
+                    const data = d3.select(this).datum();
+                    const linkId = data.id;
+                    console.log("data = " + data);
+
+                    event.stopPropagation();
+                    // 创建<section>元素 from  relation to
+                    copied_links3.forEach(link => {
+                        console.log("byIdFindArrayIndex2=" + link);
+                    })
+                    const index = byIdFindArrayIndex2(copied_links3, linkId);
+                    console.log("index=" + index);
+                    const x = byEdgeSourceOrTargetFindNodeID2(copied_nodes3, copied_links3[index].source.id);
+                    const y = byEdgeSourceOrTargetFindNodeID2(copied_nodes3, copied_links3[index].target.id);
+                    // copied_nodes.forEach
+
+                    const section = document.createElement("section");
+                    console.log("x=" + x);//5
+                    console.log("x=" + y);
+
+                    if (x >= 0 && x < copied_nodes3.length) {
+                        let startX;
+                        let startY;
+                        let endX;
+                        let endY;
+
+                        const elementx = document.getElementById("search-" + copied_nodes3[x].id);//通过id获得元素
+                        if (elementx) {
+                            const rect = elementx.getBoundingClientRect();
+                            startX = rect.left + 40 / 2;
+                            startY = rect.top + 40 / 2;//46.6
+                            console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+                        }
+                        const elementy = document.getElementById("search-" + copied_nodes3[y].id);
+                        if (elementy) {
+                            const rect = elementy.getBoundingClientRect();
+                            endX = rect.left + 40 / 2;
+                            endY = rect.top + 46.3 / 3;//46.6
+                            console.log("rect.left = " + rect.left + "rect.top = " + rect.top);
+                        }
+                        const midX = (startX + endX) / 2 - 160;
+                        const midY = (startY + endY) / 2 + 10;
+
+                        console.log("midX = " + midX + "midY = " + midY);
+
+                        section.setAttribute("class", "netLinkInfo-box panel-relation");
+
+                        section.setAttribute("style", `left: ${midX}px; top: ${midY}px;`);
+                        console.log(`startX: ${midX}, startY: ${midY}`);
+                    } else {
+                        console.log("Invalid index for coordinates array");
+                    }
+
+                    // 创建<div>元素，并添加class和id属性
+                    const div = document.createElement("div");
+                    div.setAttribute("class", "atobNetLinkInfo-li");
+                    div.setAttribute("id", "cad59ab2a99a600018b05dc");
+
+                    // 创建关系信息框的标题部分
+                    const titleDiv = document.createElement("div");
+                    titleDiv.setAttribute("class", "atobNetLinkInfo-title");
+
+                    // 创建第一个人物名称<span>元素，设置title属性和文本内容
+                    const name1Span = document.createElement("span");
+                    const fromtext = bySourceFindName(copied_links3[index].source);//links[index].source id
+                    const totext = bySourceFindName(copied_links3[index].target);
+
+                    name1Span.setAttribute("title", fromtext);
+                    name1Span.textContent = fromtext;
+                    titleDiv.appendChild(name1Span);
+
+                    // 创建关系描述<span>元素
+                    const relationDescSpan = document.createElement("span");
+                    relationDescSpan.setAttribute("class", "relationDesc");
+
+                    // 创建关系描述中的箭头图标<span>元素
+                    const rightIconSpan = document.createElement("span");
+                    rightIconSpan.setAttribute("class", "right-icon");
+
+                    // 创建关系描述中的文本<span>元素
+                    const descTextSpan = document.createElement("span");
+                    const relationtext = copied_links3[index].description;
+                    descTextSpan.setAttribute("class", "desc-text");
+                    descTextSpan.textContent = relationtext;
+                    // 将箭头图标和文本元素添加到关系描述<span>元素中
+                    // relationDescSpan.appendChild(leftIconSpan);
+                    relationDescSpan.appendChild(rightIconSpan);
+                    relationDescSpan.appendChild(descTextSpan);
+                    // 将关系描述<span>元素添加到标题部分<div>元素中
+                    titleDiv.appendChild(relationDescSpan);
+
+                    // 创建第二个人物名称<span>元素，设置title属性和文本内容
+                    const name2Span = document.createElement("span");
+                    name2Span.setAttribute("title", totext);
+                    name2Span.textContent = totext;
+                    titleDiv.appendChild(name2Span);
+
+                    // 将标题部分<div>元素添加到关系信息框<div>元素中
+                    div.appendChild(titleDiv);
+
+                    // 创建关系信息框的内容部分<div>元素
+                    const contentDiv = document.createElement("div");
+                    contentDiv.setAttribute("class", "atobNetLinkInfo-content");
+
+                    // 创建描述信息<div>元素，并设置文本内容
+                    const descriptionDiv = document.createElement("div");
+                    descriptionDiv.setAttribute("class", "atobNetLinkInfo-description");
+                    descriptionDiv.textContent = copied_links3[index].details;
+                    // 将描述信息<div>元素添加到内容部分<div>元素中
+                    contentDiv.appendChild(descriptionDiv);
+
+                    // 将标题部分和内容部分添加到关系信息框<div>元素中
+                    div.appendChild(titleDiv);
+                    div.appendChild(contentDiv);
+
+                    // 将关系信息框<div>元素添加到<section>元素中
+                    section.appendChild(div);
+
+                    // 将整个<section>元素添加到<body>下
+                    document.body.appendChild(section);
+                    sectionExists = true;
+
+                    const width = descTextSpan.offsetWidth;
+                    // console.log("Width:", width);
+                    const descTextSpanElement = document.querySelector(".desc-text");
+                    descTextSpanElement.style.position = "relative";
+                    descTextSpanElement.style.top = "-1px";
+
+                    descTextSpanElement.style.left = "-50px";
+                    const rightIconElement = document.querySelector(".right-icon");
+                    rightIconElement.style.position = "relative";
+                    rightIconElement.style.top = "3px";
+                    event.stopPropagation();
+                })
+                .each(function (d) {
+                    // 获取当前线的边界框，并向四周扩展3px
+                    const bbox = this.getBBox();
+                    d.bbox = {
+                        x: bbox.x - 6,
+                        y: bbox.y - 6,
+                        width: bbox.width + 12,
+                        height: bbox.height + 12
+                    };
+                });
+
+            d3.select("body")
+                .on("mousedown", function () {
+                    // 选择要删除的<section>元素
+                    const sectionToRemove = document.querySelector(".netLinkInfo-box");
+
+                    // 检查是否存在需要删除的<section>元素
+                    if (sectionToRemove) {
+                        // 选择该元素的父节点，并调用removeChild()方法将其从DOM中移除
+                        sectionToRemove.parentNode.removeChild(sectionToRemove);
+                    }
+                });
+
+            const linkGroup3 = d3.select("#searchgraph3").selectAll(".link-group")
+                .data(copied_links3)
+                .enter()
+                .append("g")
+                .attr("class", "link-group");
+            const linkRect3 = linkGroup3.append("rect")
+                .attr("class", "link-rect")
+                .attr("rx", 5)
+                .attr("ry", 5);
+            const linkText3 = linkGroup3.append("text")
+                .attr("class", "link-text")
+                .text(d => d.description)
+                .raise();
+
+            searchSimulation3.on("tick", search_ticked);
+            // 更新节点、边和文本的位置
+            function search_ticked() {
+                search_node3.attr("transform", d => {
+                    // console.log("d.id=" + d.id);
+                    // console.log("d.x=" + d.x);
+                    // console.log("d.y=" + d.y);
+                    return `translate(${d.x},${d.y})`;
+                });
+                // 将节点限制在一个圆周上
+                // search_node.attr("transform", function (d, i) {
+                //     const x = 250 + Math.cos(i / nodes.length * 2 * Math.PI) * 200;
+                //     const y = 250 + Math.sin(i / nodes.length * 2 * Math.PI) * 200;
+
+                //     return `translate(${x},${y})`;;
+                // });
+                let nodeCoordinates = [];
+                search_node3.each(d => {
+                    nodeCoordinates[d.id] = { x: d.x, y: d.y };
+                });
+
+                searchLinkPath.attr("d", d => {
+                    const sourceCoords = nodeCoordinates[d.source.id];
+                    const targetCoords = nodeCoordinates[d.target.id];
+                    return `M${sourceCoords.x},${sourceCoords.y}L${targetCoords.x},${targetCoords.y}`;
+                });
+                linkGroup3.attr("transform", d => {
+                    const sourceCoords = nodeCoordinates[d.source.id];
+                    const targetCoords = nodeCoordinates[d.target.id];
+
+                    const dx = targetCoords.x - sourceCoords.x;
+                    const dy = targetCoords.y - sourceCoords.y;
+                    const x = (sourceCoords.x + targetCoords.x) / 2;
+                    const y = (sourceCoords.y + targetCoords.y) / 2;
+                    return `translate(${x},${y}) rotate(${Math.atan2(dy, dx) * 180 / Math.PI})`;
+                });
+                linkRect3.each(function (d) {
+                    const bbox = this.getBBox();
+                    const padding = 10;
+                    const text = d3.select(this.parentNode).select(".link-text").node();
+                    const textWidth = text ? text.getBBox().width : 0;
+                    const textHeight = text ? text.getBBox().height : 0;
+                    d3.select(this)
+                        .attr("width", textWidth + padding)
+                        .attr("height", bbox.height)
+                        .attr("x", -textWidth / 2 - padding / 2)
+                        .attr("y", -bbox.height / 2 + padding / 32);
+                    if (text) {
+                        d3.select(text)
+                            .attr("x", -textWidth / 2)
+                            .attr("y", textHeight / 64 + 2); // 调整文本的垂直位置为矩形框的64分之一处
+                    }
+                });
+            }
+
+            // 定义拖动行为
+            function searchdrag3(searchSimulation3) {
+
+                // 开始拖动
+                function dragstarted(event) {
+                    if (!event.active) searchSimulation3.alphaTarget(0.3).restart();
+                    event.subject.fx = event.subject.x;
+                    event.subject.fy = event.subject.y;
+
+                }
+
+                // 拖动中
+                function dragged(event) {
+                    event.subject.fx = event.x;
+                    event.subject.fy = event.y;
+
+                }
+
+                // 结束拖动
+                function dragended(event) {
+                    if (!event.active) searchSimulation3.alphaTarget(0);
+                    event.subject.fx = event.x;
+                    event.subject.fy = event.y;
+
+                }
+
+                return d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended);
+            }
+        }
+    }
+}
+
+// 添加点击事件监听器,搜索
+searchIcon.addEventListener('click', handleSearch);
+
+// 添加按键事件监听器
+searchInput.addEventListener('keyup', function (event) {
+    if (event.key === 'Enter') {
+        // location.reload();
+        handleSearch();
+
+    }
+});
+
+// play-auto
+var flag = false;
+let time_index = 0;
+document.querySelector('.play-auto').addEventListener('click', function () {
+    // 点击事件处理程序
+    // 在这里编写你想要执行的代码
+    const videoElem = document.querySelector('.video-auto-play');
+    let intervalId;
+    if (!flag) {
+        flag = true;
+    }
+    if (videoElem.classList.contains("play")) {
+        videoElem.classList.remove("play");
+        var rightCircle = document.getElementById('rightCircle');
+        var leftCircle = document.getElementById('leftCircle');
+        // var leftCircle = document.querySelector('.leftcircle');
+        // rightCircle.classList.remove('rightcircle');
+        // leftCircle.classList.remove('leftcircle');
+
+        // clearInterval(intervalId);
+
+        flag = false;
+    }
+    else {
+        videoElem.classList.add("play");
+        // if
+        // flag = true;
+        // 获取需要旋转的元素
+        // 第一次调用函数开始动画
+        // let t = 0;
+        if (!menuElem.classList.contains("active")) {
+            menuElem.classList.add('active');
+        }
+
+        // for (t = 0; t < links.length; t++) {
+
+        //     // relationListClick(t);
+        //     //2
+        //     const h = t + 1;
+        // function wait(timeout) {
+        //     return new Promise((resolve) => {
+        //         setTimeout(resolve, timeout);
+        //     });
+        // }
+        // flag = false;
+
+
+        // 创建定时器
+        intervalId = setInterval(() => {
+            if (time_index < links.length && (flag == true)) {
+                console.log(links[time_index]);
+                const h = time_index + 1;
+                time_index++;
+                const trelationList = d3.select("#relationlist-container").select(".relation-list");
+                trelationList.selectAll(".item.active")
+                    .classed("active", false)
+                    .classed("item", true);
+                const sections = document.querySelectorAll("body section");
+                sections.forEach(section => {
+                    section.innerHTML = '';
+                    section.remove();
+                });
+                const firstItem = trelationList.select(".item").node();
+                const relationPageId = "relation-page-" + h;
+                const relationPage = document.querySelector("#" + relationPageId);
+                // 计算目标li元素相对于ul元素的偏移
+                const offsetTop = relationPage.offsetTop;
+                // 调整ul元素的滚动条位置
+                trelationList.scrollTop = offsetTop;
+                relationListClick(time_index);
+                relationListSection(time_index);
+                if (!relationPage.classList.contains("active")) {
+                    relationPage.classList.add('active');
+                }
+                trelationList.node().insertBefore(relationPage, firstItem);
+                time_index++;
+                const rightCircle = document.getElementById('rightCircle');
+                const leftCircle = document.getElementById('leftCircle');
+                // const startButton = document.getElementById('startButton');
+                let animationRunning = false;
+                // 初始时移除动画 class
+                rightCircle.classList.remove('rightcircle');
+                leftCircle.classList.remove('leftcircle');
+
+//                if (!animationRunning) {
+//                    // 重新添加动画 class 触发动画
+//                    rightCircle.classList.add('rightcircle');
+//                    leftCircle.classList.add('leftcircle');
+//                    animationRunning = true;
+//
+//                    // 动画结束后重置动画状态
+//                    rightCircle.addEventListener('animationend', function () {
+//                        // resetAnimation();
+//                        rightCircle.classList.remove('rightcircle');
+//                        leftCircle.classList.remove('leftcircle');
+//                        animationRunning = false;
+//                    });
+//                }
+                // startRotationAnimation();
+
+                // if (time_index == links.length) {
+                //     time_index = 0;
+                //     sections.forEach(section => {
+                //         section.innerHTML = '';
+                //         section.remove();
+                //     });
+                // }
+            } else {
+                if (flag == false) {
+                    clearInterval(intervalId); // 当遍历完成时清除定时器
+                } else {
+                    // flag = true;
+                    console.log("time_index = " + time_index);
+                    const sections = document.querySelectorAll("body section");
+                    sections.forEach(section => {
+                        section.innerHTML = '';
+                        section.remove();
+                    });
+                    time_index = 0;
+                    setInterval();
+                }
+            }
+        }, 3000);
+
+
+        // for (t = 0; t < links.length; t++) {
+        //     console.log("开始");
+        //     setTimeout(function () {
+        //         console.log("等待了2秒后执行第一步");
+        //         // 在这里编写第一步的代码
+        //         let t = 0;
+
+        // relationListClick(t);
+        //2
+        // const h = t + 1;
+        // const trelationList = d3.select("#relationlist-container").select(".relation-list");
+        // trelationList.selectAll(".item.active")
+        //     .classed("active", false)
+        //     .classed("item", true);
+
+        // const relationPageId = "relation-page-" + h;
+        // const relationPage = document.querySelector("#" + relationPageId);
+        // if (!relationPage.classList.contains("active")) {
+        //     relationPage.classList.add('active');
+        // }
+
+        // }, 2000);
+        // (async function () {
+        // await wait(2000);
+        // console.log('等待了2秒之后执行的代码');
+        // // 在这里放置您想要延迟执行的代码
+        // console.log('等待了2秒之后执行的代码');
+        // const trelationList = d3.select("#relationlist-container").select(".relation-list");
+        // trelationList.selectAll(".item.active")
+        //     .classed("active", false)
+        //     .classed("item", true);
+
+        // const relationPageId = "relation-page-" + h;
+        // const relationPage = document.querySelector("#" + relationPageId);
+        // if (!relationPage.classList.contains("active")) {
+        //     relationPage.classList.add('active');
+        // }
+        // })();
+        console.log('继续执行');
+
+        //3
+        // relationListSection(t);
+        //4 旋转
+        // startRotationAnimation();
+
+        // var rightCircle = document.querySelector('#rightCircle');
+        // var leftCircle = document.querySelector('#leftCircle');
+        // var leftCircle = document.querySelector('.leftcircle');
+
+
+
+        // 5 清除
+        // clickBody();
+        // break;
+        //     }
+    }
+
+});
+
+// 关系探索
+// 设置初始旋转角度和目标旋转角度
+// 获取需要旋转的元素
+
+function startRotationAnimation() {
+
+    // 获取需要旋转的元素
+    var rightCircle = document.querySelector('#rightCircle');
+    var leftCircle = document.querySelector('#leftCircle');
+    // var leftCircle = document.querySelector('.leftcircle');
+    rightCircle.classList.add('rightcircle');
+    leftCircle.classList.add('leftcircle');
+
+    var animationCount = 0;
+
+    // 监听动画结束事件
+    rightCircle.addEventListener('animationend', function () {
+        // 动画结束后恢复原始颜色
+        rightCircle.style.backgroundColor = 'lightsteelblue'; // 替换为原始颜色
+
+        animationCount++;
+        if (animationCount === 2) {
+            rightCircle.classList.move('rightcircle');
+            // clickBody(); // 当两个动画都结束时执行 clickBody 函数
+        }
+    });
+
+    leftCircle.addEventListener('animationend', function () {
+        // 动画结束后恢复原始颜色
+        leftCircle.style.backgroundColor = 'lightsteelblue'; // 替换为原始颜色
+
+        animationCount++;
+        // if (animationCount === 2) {
+        //     leftCircle.classList.move('leftcircle');
+        //     // clickBody(); // 当两个动画都结束时执行 clickBody 函数
+        // }
+
+
+    });
+    // clickBody();
+    // // 定义旋转角度
+    // var rotation = 0;
+
+    // // 执行第一个旋转动画
+    // for (var i = 135; i < 225; i++) {
+    //     await delay(10); // 等待10毫秒
+    //     rotation += 1;
+    //     rightCircle.style.transform = "rotate(" + rotation + "deg)";
+    // }
+
+    // rotation = 0; // 重置旋转角度
+
+    // // 执行第二个旋转动画
+    // for (var i = 45; i < 405; i++) {
+    //     await delay(10); // 等待10毫秒
+    //     rotation += 1;
+    //     leftCircle.style.transform = "rotate(" + rotation + "deg)";
+    // }
+
+    // 两个动画执行完毕后执行 clickBody 函数
+}
+
+
+
+

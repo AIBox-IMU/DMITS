@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>认知诊断展示</title>
+    <link href="<< url_for('static', filename='CSS/global/intelligence-center.css') >>" rel="stylesheet">
+    <link href="<< url_for('static', filename='CSS/global/site-navigation.css') >>" rel="stylesheet">
+</head>
+
+<body class="ai-page has-site-dock">
+    <div class="ai-shell" id="diag-page-root">
+        <header class="ai-topbar">
+            <a class="ai-brand" href="<< url_for('INDEX') >>">
+                <span class="ai-brand-mark">AI</span>
+                <span class="ai-brand-copy">
+                    <span class="ai-brand-kicker">Math System</span>
+                    <span class="ai-brand-title">认知诊断展示</span>
+                </span>
+            </a>
+{#            <div class="ai-topbar-side">#}
+{#                <span class="ai-badge is-accent">模型接口预留中</span>#}
+{#            </div>#}
+        </header>
+
+        <main class="ai-main">
+            <section class="ai-hero">
+                <div class="ai-hero-copy">
+                    <div class="ai-hero-kicker">Cognitive Diagnosis Dashboard</div>
+                    <h1 class="ai-hero-title">把学生作答行为转化成可解释的知识掌握画像</h1>
+                    <div class="ai-hero-tags" id="diag-student-meta"></div>
+                    <div class="ai-note-box">
+                        <strong id="diag-student-name">示例学生</strong>
+                        页面已预留“学生答题记录 -> 认知诊断模型 -> 前端展示”的完整承接结构，后续可以直接替换成真实模型输出。
+                    </div>
+                </div>
+                <div class="ai-hero-side">
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">综合掌握度</span>
+                        <span class="ai-metric-value" id="diag-mastery-score">--</span>
+                        <span class="ai-metric-footnote">汇总知识点掌握水平与稳定性</span>
+                    </div>
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">高风险知识点</span>
+                        <span class="ai-metric-value" id="diag-high-risk-count">--</span>
+                        <span class="ai-metric-footnote">当前最需要优先干预的模块数量</span>
+                    </div>
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">预计补强增益</span>
+                        <span class="ai-metric-value" id="diag-expected-gain">--</span>
+                        <span class="ai-metric-footnote">完成建议动作后的预估提升空间</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-metric-grid" id="diag-overview-grid"></section>
+
+            <section class="ai-grid-two">
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>知识掌握雷达</h2>
+                            <p class="ai-section-subtitle">将核心知识模块汇聚成一张可解释的多维掌握画像。</p>
+                        </div>
+                    </div>
+                    <div class="diagnosis-radar-layout">
+                        <div id="diag-radar" class="diagnosis-radar-chart"></div>
+                        <div id="diag-radar-legend" class="diagnosis-radar-legend"></div>
+                    </div>
+                </article>
+
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>诊断说明</h2>
+                            <p class="ai-section-subtitle">模型摘要、置信度和教师可阅读结论。</p>
+                        </div>
+                    </div>
+                    <div class="ai-note-box" id="diag-integration-note"></div>
+                </article>
+            </section>
+
+            <section class="ai-card">
+                <div class="ai-section-head">
+                    <div>
+                        <h2>知识点掌握卡片</h2>
+                        <p class="ai-section-subtitle">每张卡片都可直接映射到单知识点的诊断结果，便于逐项追踪。</p>
+                    </div>
+                </div>
+                <div class="diagnosis-knowledge-grid" id="diag-knowledge-grid"></div>
+            </section>
+
+            <section class="ai-card">
+                <div class="ai-section-head">
+                    <div>
+                        <h2>能力分层矩阵</h2>
+                        <p class="ai-section-subtitle">从识记、理解、应用、迁移四个维度刻画每个知识点的掌握深度。</p>
+                    </div>
+                </div>
+                <div class="diagnosis-matrix-wrap">
+                    <table class="diagnosis-matrix">
+                        <thead id="diag-matrix-head"></thead>
+                        <tbody id="diag-matrix-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="ai-grid-two">
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>关键风险诊断</h2>
+                            <p class="ai-section-subtitle">直接突出教师和系统最值得优先关注的核心问题。</p>
+                        </div>
+                    </div>
+                    <div class="diagnosis-issues-grid" id="diag-issues-grid"></div>
+                </article>
+
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>阶段表现时间线</h2>
+                            <p class="ai-section-subtitle">适合接入学生多次作答后的阶段性诊断变化。</p>
+                        </div>
+                    </div>
+                    <div class="diagnosis-timeline" id="diag-timeline"></div>
+                </article>
+            </section>
+
+            <section class="ai-card">
+                <div class="ai-section-head">
+                    <div>
+                        <h2>干预建议</h2>
+                        <p class="ai-section-subtitle">这里可直接承接模型给出的个性化学习建议与教师干预动作。</p>
+                    </div>
+                </div>
+                <div class="diagnosis-actions-grid" id="diag-actions-grid"></div>
+            </section>
+        </main>
+
+        {% set dock_class = 'site-page-dock--ai' %}
+        {% include '_site_page_dock.html' %}
+    </div>
+
+    <script src="<< url_for('static', filename='JS/global/intelligence-common.js') >>"></script>
+    <script src="<< url_for('static', filename='JS/global/cognitive-diagnosis.js') >>"></script>
+</body>
+
+</html>

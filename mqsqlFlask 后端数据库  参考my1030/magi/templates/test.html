@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+</head>
+<body>
+    
+</body>
+<script>
+    $.ajax({
+
+            url: "http://localhost:8080/mt/0/1",
+
+            type: "post",
+
+            dataType: "json",
+
+            data: 
+                JSON.stringify({
+                    'valueMap': [
+                        { '2': 'ada' },
+                        { '3': 'www' }
+                    ]})
+                
+            ,
+
+            headers: { 'Content-Type': 'application/json' },
+
+            success: function (ret) {
+
+                console.log(ret)
+
+            }
+
+        })
+</script>
+</html>

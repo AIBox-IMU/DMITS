@@ -1,0 +1,11 @@
+<nav class="site-page-dock << dock_class or '' >>" aria-label="站内快捷跳转">
+    <span class="site-page-dock__label">Quick Jump</span>
+    <div class="site-page-dock__links">
+        {% for page in site_pages %}
+        <a class="site-page-dock__link{% if page.key == current_page %} is-active{% endif %}{% if page.key == 'portal' %} is-home{% endif %}" href="<< page.url >>">
+            <span class="site-page-dock__dot"></span>
+            << page.short_title >>
+        </a>
+        {% endfor %}
+    </div>
+</nav>

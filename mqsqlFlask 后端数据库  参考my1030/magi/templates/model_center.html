@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模型调用中心</title>
+    <link href="<< url_for('static', filename='CSS/global/intelligence-center.css') >>" rel="stylesheet">
+    <link href="<< url_for('static', filename='CSS/global/site-navigation.css') >>" rel="stylesheet">
+    <link href="<< url_for('static', filename='CSS/global/model-workbench.css') >>" rel="stylesheet">
+</head>
+
+<body class="ai-page has-site-dock">
+    <div class="ai-shell">
+        <header class="ai-topbar">
+            <a class="ai-brand" href="<< url_for('INDEX') >>">
+                <span class="ai-brand-mark">ML</span>
+                <span class="ai-brand-copy">
+                    <span class="ai-brand-kicker">Math System</span>
+                    <span class="ai-brand-title">模型调用中心</span>
+                </span>
+            </a>
+            <div class="ai-topbar-side">
+                <span class="ai-badge is-accent">6 类模型工作台</span>
+                <span class="ai-badge">输入、调用、展示一体化</span>
+            </div>
+        </header>
+
+        <main class="ai-main">
+            <section class="ai-hero model-center-hero">
+                <div class="ai-hero-copy">
+                    <div class="ai-hero-kicker">Model Workbench Hub</div>
+                    <h3 class="ai-hero-title">把模型调用统一收口到一个入口里，会比散着加页面更清晰</h3>
+                    <div class="ai-hero-tags">
+                        <span class="ai-chip">文档上传入口</span>
+                        <span class="ai-chip">文本输入入口</span>
+                        <span class="ai-chip">按钮触发调用</span>
+                        <span class="ai-chip">结果回显与可视化</span>
+                    </div>
+                </div>
+                <div class="ai-hero-side">
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">工作台数量</span>
+                        <span class="ai-metric-value">6</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-card">
+                <div class="ai-section-head">
+                    <div>
+                        <h2>模型工作台</h2>
+                        <p class="ai-section-subtitle">每个子页面都支持输入、调用与结果展示，后续可分别替换为真实模型。</p>
+                    </div>
+                </div>
+                <div class="model-center-grid">
+                    {% for page in model_pages %}
+                    <a class="model-center-card tone-<< page.accent >>" href="<< page.url >>">
+                        <span class="model-center-card-kicker"><< page.kicker >></span>
+                        <h3><< page.title >></h3>
+                        <p><< page.summary >></p>
+                        <div class="model-center-card-meta">
+                            <span>进入工作台</span>
+                            <span><< page.submit_label >></span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+
+        </main>
+
+        {% set dock_class = 'site-page-dock--ai' %}
+        {% include '_site_page_dock.html' %}
+    </div>
+</body>
+
+</html>

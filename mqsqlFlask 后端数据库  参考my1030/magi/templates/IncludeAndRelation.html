@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ECharts 绘制包含关系树</title>
+    <!-- 引入 ECharts -->
+    <!-- <script src="display\dist\static\js\echarts.min.js"></script> -->
+    <script src="./static/js/echarts.min.js"></script>
+    <link href="./static/css/my.css" rel="stylesheet">
+    <link href="./static/css/relationMain.css" rel="stylesheet">
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            background-image: linear-gradient(to bottom left, #2e3b4e, #0d0d13 52%, #0d0d13)
+        }
+
+        #includeRelatainTreeContainer {
+            /* top: 50%;
+            left: 50%; */
+            width: auto;
+            height: 80%;
+            resize: both;
+            overflow: auto;
+        }
+    </style>
+
+
+
+</head>
+
+<body>
+    <div id="left-control-container"></div>
+    <div id="right-control-container"></div>
+    <!-- 在页面上创建一个容器来放置图表 -->
+    <div id="includeRelatainTreeContainer"></div>
+
+    <!-- <div class="right-float-button-container" id="rightFloatButtonContainer">
+        <button class="right-float-button" id="button1">扇形界面</button>
+        <button class="right-float-button" id="button1">包含关系图</button>
+        <button class="right-float-button" id="button2">全历史图</button>
+    </div> -->
+    <!-- 使用 JavaScript 代码绘制图表 -->
+    <script>
+        //  获取按钮容器和按钮
+        // var rightFloatButtonContainer = document.getElementById('rightFloatButtonContainer');
+        // var rightFloatButtons = document.querySelectorAll('.right-float-button');
+
+        // // 判断鼠标是否在按钮
+        // function isMouseOverButtonOrMarker(event) {
+        //     var target = event.target;
+        //     return (target === rightFloatButtonContainer || target.classList.contains('right-float-button'));
+        // }
+
+        // // 显示按钮
+        // function showRightFloatButtons() {
+        //     rightFloatButtonContainer.classList.add('visible');
+        // }
+
+        // // 隐藏按钮
+        // function hideRightFloatButtons() {
+        //     rightFloatButtonContainer.classList.remove('visible');
+        // }
+
+        // // 鼠标移入时显示按钮
+        // document.addEventListener('mousemove', function (event) {
+        //     if (isMouseOverButtonOrMarker(event)) {
+        //         showRightFloatButtons();
+        //     } else {
+        //         hideRightFloatButtons();
+        //     }
+        // });
+
+        // // 点击事件处理
+        // rightFloatButtons.forEach(function (button) {
+        //     button.addEventListener('click', function () {
+        //         // alert('点击了按钮: ' + button.textContent);
+        //         if (button.textContent == "包含关系图") {
+        //             location.href = 'IncludeAndRelation.html';
+        //         } else if (button.textContent == "全历史图") {
+        //             location.href = 'IncludeAndQuanlishi.html';
+        //         } else {// 扇形界面
+        //             location.href = 'IncludeTwoSector.html';
+        //         }
+
+        //     });
+        // });
+
+        // 数据结构
+        const includeRelationTreeData = {
+            name: '父节点',
+            color: '#CCFFCC',//绿色
+            children: [
+                {
+                    name: '子节点1',
+                    color: '#FFCCCC',
+                    children: [
+                        {
+                            name: '叶子节点1', color: '#FFCCCC',
+                            name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                        {
+                            name: '叶子节点2', color: '#FFCCCC',
+                            name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                    ],
+                },
+                {
+                    name: '子节点2',
+                    color: '#FFCCCC',
+                    children: [
+                        {
+                            name: '叶子节点3', color: '#FFCCCC', name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                        {
+                            name: '叶子节点4', color: '#FFCCCC', name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                    ],
+                },
+                {
+                    name: '子节点3',
+                    color: '#FFCCCC',
+                    children: [
+                        {
+                            name: '叶子节点3', color: '#FFCCCC', name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                        {
+                            name: '叶子节点4', color: '#FFCCCC', name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                    ],
+                },
+                {
+                    name: '子节点4',
+                    color: '#FFCCCC',
+                    children: [
+                        {
+                            name: '叶子节点3', color: '#FFCCCC', name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                        {
+                            name: '叶子节点4', color: '#FFCCCC', name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                    ],
+                },
+                {
+                    name: '子节点5',
+                    color: '#FFCCCC',
+                    children: [
+                        {
+                            name: '叶子节点3', color: '#FFCCCC', name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                        {
+                            name: '叶子节点4', color: '#FFCCCC', name: '子节点1',
+                            color: '#FFFFCC',
+
+                        },
+                    ]
+                },
+                {
+                    name: '子节点6',
+                    color: '#FFCCCC',
+                    children: [
+                        { name: '叶子节点3', color: '#FFFFCC' },
+                        { name: '叶子节点4', color: '#FFFFCC' },
+                    ],
+
+                },
+            ],
+        };
+
+        function convertData(node, depth) {
+            const result = {
+                name: node.name,
+                color: node.color,
+                label: { backgroundColor: node.color }
+            };
+            if (node.children && node.children.length > 0) {
+                result.children = [];
+                for (const child of node.children) {
+                    result.children.push(convertData(child, depth + 1));
+                }
+            } else {
+                result.itemStyle = {
+                    normal: {
+                        color: ['#FFFFCC', '#CCFFCC', '#FFCCFF', '#6699CC'][depth % 4],
+                    },
+                };
+            }
+            return result;
+        }
+
+        // FFFFCC 黄色  CCFFCC绿色  	6699CC蓝色 FFCCFF紫 隔开  FFCCCC粉色
+        const colorSet = ["#FFFFCC", "#CCFFCC", "#FFCCFF", "#6699CC"];
+
+        option = {
+            series: [
+                {
+                    // 当此节点下还有子节点时候，设置的节点样式，用于区别 没有子节点的节点的样式
+                    itemStyle: {
+                        normal: {
+                            color: '#06c',
+                            borderColor: '#06c',
+                            borderRadius: 100,
+                            shape: 'circle',
+
+                        },
+                    },
+                    lineStyle: {   //线的样式
+                        color: '#888888',
+                        height: 1,
+                    },
+                    type: 'tree',
+                    passive: true,
+                    data: [convertData(includeRelationTreeData, 0)],  //data为树图的数据，格式：{id:111，name:xxx,children:[{id:222,name:xxx,children:[...]},...]}
+                    left: '15%',
+                    right: '15%',
+                    top: '20%',
+                    // class: "aaaaaaaa",
+                    // id: "aaaaaaaaa",
+                    bottom: '20%',
+                    // symbol: 'rect',
+                    symbolSize: 0,  //节点大小
+                    orient: 'vertical',
+                    expandAndCollapse: true,  //是否开启折叠功能
+                    // expandAndCollapse: false,  //是否开启折叠功能
+                    edgeShape: 'polyline',  //连接线会以折线的形式绘制
+                    edgeLength: [10, 10],
+                    label: {   //节点样式
+                        label: {
+                            show: true,
+                            position: 'inside',
+                        },
+
+                        fontFamily: 'KaiTi',//字体设置为楷体
+                        position: 'center',  //节点文字在节点的上方
+                        verticalAlign: 'middle',
+                        align: 'right',
+                        overflow: 'hidden',
+                        margin: [1, 1],
+                        borderWidth: 2,  //文字添加边框
+                        borderColor: '#FFFFCC',   //边框颜色
+                        // backgroundColor: '#FFFFCC',
+
+                        backgroundColor: function (value) {
+                            console.log("函数");
+                            console.log(value.data.color);
+                            return value.data.color;
+                        },
+                        padding: [7, 7],
+                        // 设置节点为圆形
+                        rich: {
+                            // keywords: {
+                            //     color: "red",
+                            //     fontSize: 12,
+                            // },
+                            // index: {
+                            //     fontSize: 12,
+                            //     color: '#2979ff',
+                            //     position: '10%'
+                            // },
+                        },
+                        textStyle: {
+                            width: 50,   // 定义节点文字长度
+                            height: 50,
+                            fontSize: 10,  // 文字大小
+                            color: '#444444', // 文字颜色
+                            align: 'center',  // 文字的位置
+                        },
+                    },
+                    leaves: {
+                        label: {
+                            position: 'top',
+                            verticalAlign: 'middle',
+                        }
+                    },
+                    formatter: function (params) {
+                        console.log("cons:" + params.value.data.name);
+                        if (params.value.data.name.length >= 3) {
+                            params.data.name = params.data.name.substring(0, 2) + '..'
+                        }
+                        return params.data.name
+                    },
+                    // edgeSymbolSize: [4, 8],
+                    // animationDurationUpdate: 2000  //动画过渡效果的时间，毫秒
+                    // animationDurationUpdate: 1000
+                    animationDuration: 2000
+                }
+            ]
+        };
+        // var relatainTreeDom = document.getElementById('');
+        var relatainTreeDom = document.getElementById('includeRelatainTreeContainer');
+        var relatainTreeChart = echarts.init(relatainTreeDom);
+        relatainTreeChart.setOption(option, true);
+
+        const observerRelationTree = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const { width, height } = entry.contentRect;
+                relatainTreeChart.resize({ width, height });
+                const containerWidth = width;
+                const containerHeight = height;
+                console.log("containerWidt = " + containerWidth);
+                // const fontSize = Math.floor(containerWidth / (containerWidth / 10)); // 自定义调整比例
+                const fontSize = Math.floor(width / 110); // 自定义调整比例
+                const labelWidth = width / 50; // 自定义调整比例
+                const labelHeight = height / 50; // 自定义调整比例
+                option.series[0].label.textStyle.fontSize = fontSize;
+                option.series[0].label.textStyle.width = labelWidth;
+                option.series[0].label.textStyle.height = labelHeight;
+
+                // option.series[0].label.textStyle.width = containerWidth / (containerWidth / 50);
+                // option.series[0].label.textStyle.height = containerHeight / (containerWidth / 20);
+                relatainTreeChart.setOption(option, true);
+            }
+        });
+
+        observerRelationTree.observe(relatainTreeDom);
+
+        relatainTreeChart = echarts.init(relatainTreeDom, null, {
+            renderer: 'canvas'
+        });
+        relatainTreeChart.getZr().handler.on('mousedown', function (event) {
+            if (event.which === 1) {
+                relatainTreeChart.getZr().handler.trigger('startDragging');
+            }
+        });
+        relatainTreeChart.getZr().handler.on('mouseup', function () {
+            relatainTreeChart.getZr().handler.trigger('stopDragging');
+        });
+        // relatainTreeChart.setOption(option, true);
+
+    </script>
+</body>
+
+</html>

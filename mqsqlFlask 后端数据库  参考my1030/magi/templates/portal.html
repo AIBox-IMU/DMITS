@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>站点导航</title>
+    <link href="<< url_for('static', filename='CSS/global/site-navigation.css') >>" rel="stylesheet">
+</head>
+
+<body class="site-portal-page">
+    <div class="site-portal-shell">
+        <section class="site-portal-hero">
+            <span class="site-portal-kicker">Math System Portal</span>
+{#            <h1 class="site-portal-title">一个入口，通往整个教学智能站点</h1>#}
+{#            <p class="site-portal-desc">#}
+{#                这里作为全站导航页，统一汇总知识图谱展示、认知诊断、学习路径推荐、Q 矩阵构建等页面。后续如果继续扩展其他模块，只需要把新页面注册进页面列表，就能自动出现在这里和各子页面的快捷跳转组件中。#}
+{#            </p>#}
+            <div class="site-portal-chip-row">
+                <span class="site-portal-chip"><strong><< portal_pages | length >></strong> 个业务页面已接入</span>
+                <span class="site-portal-chip"><strong>1</strong> 个统一入口页</span>
+                <span class="site-portal-chip"><strong>可扩展</strong> 后续新增页面自动纳入导航</span>
+            </div>
+            <div class="site-portal-stat-row">
+                <span class="site-portal-stat"><strong>入口统一</strong> 避免站内页面各自散落</span>
+                <span class="site-portal-stat"><strong>跳转轻量</strong> 子页面改为紧凑型快捷导航</span>
+            </div>
+        </section>
+
+        <section class="site-portal-section">
+            <div class="site-portal-section-head">
+                <div>
+                    <h2>页面总览</h2>
+                    <p>点击任意卡片即可进入对应页面</p>
+                </div>
+            </div>
+            <div class="site-portal-grid">
+                {% for page in portal_pages %}
+                <a class="site-portal-card site-portal-card--<< page.tone >>" href="<< page.url >>">
+                    <span class="site-portal-card-kicker"><< page.kicker >></span>
+                    <h3><< page.title >></h3>
+                    <p><< page.summary >></p>
+                    <div class="site-portal-card-meta">
+                        <span><< page.status >></span>
+                        <span>进入页面</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+{#        <section class="site-portal-section">#}
+{#            <div class="site-portal-section-head">#}
+{#                <div>#}
+{#                    <h2>扩展方式</h2>#}
+{#                    <p>后续如果你要继续加入新页面，可以沿用当前的集中式页面注册方式，新增成本会比较低。</p>#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="site-portal-list">#}
+{#                <div class="site-portal-list-item">#}
+{#                    <strong>新增路由</strong>#}
+{#                    <span>在后端增加页面路由后，把对应页面信息追加到统一页面注册表中。</span>#}
+{#                </div>#}
+{#                <div class="site-portal-list-item">#}
+{#                    <strong>自动进入导航</strong>#}
+{#                    <span>导航页卡片和各子页面底部的快捷跳转组件都会自动使用新的页面条目。</span>#}
+{#                </div>#}
+{#            </div>#}
+{#        </section>#}
+    </div>
+</body>
+
+</html>

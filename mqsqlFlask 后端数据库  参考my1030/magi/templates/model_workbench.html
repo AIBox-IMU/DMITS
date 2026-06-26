@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><< model_page.title >> - 模型调用</title>
+    <link href="<< url_for('static', filename='CSS/global/intelligence-center.css') >>" rel="stylesheet">
+    <link href="<< url_for('static', filename='CSS/global/site-navigation.css') >>" rel="stylesheet">
+    <link href="<< url_for('static', filename='CSS/global/model-workbench.css') >>" rel="stylesheet">
+</head>
+
+<body class="ai-page has-site-dock">
+    <div class="ai-shell" id="model-page-root">
+        <header class="ai-topbar">
+            <a class="ai-brand" href="<< url_for('model_center_page') >>">
+                <span class="ai-brand-mark">ML</span>
+                <span class="ai-brand-copy">
+                    <span class="ai-brand-kicker">Model Workbench</span>
+                    <span class="ai-brand-title"><< model_page.title >></span>
+                </span>
+            </a>
+            <div class="ai-topbar-side">
+                <span class="ai-badge is-accent">模型调用页</span>
+                <span class="ai-badge">可替换后端处理逻辑</span>
+            </div>
+        </header>
+
+        <main class="ai-main">
+            <section class="model-subnav">
+                {% for page in model_pages %}
+                <a class="model-subnav-link{% if page.key == current_model_page %} is-active{% endif %}" href="<< page.url >>"><< page.nav_title >></a>
+                {% endfor %}
+            </section>
+
+            <section class="ai-hero">
+                <div class="ai-hero-copy">
+                    <div class="ai-hero-kicker"><< model_page.kicker >></div>
+                    <h1 class="ai-hero-title"><< model_page.hero_title >></h1>
+                    <p class="ai-hero-desc"><< model_page.hero_desc >></p>
+                    <div class="ai-hero-tags">
+                        <span class="ai-chip">文本输入</span>
+                        <span class="ai-chip">文档上传</span>
+                        <span class="ai-chip">按钮触发</span>
+                        <span class="ai-chip">结果回显</span>
+                    </div>
+                </div>
+                <div class="ai-hero-side">
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">当前工作台</span>
+                        <span class="ai-metric-value"><< model_page.title >></span>
+                        <span class="ai-metric-footnote">每个工作台负责一种模型的调用与结果展示</span>
+                    </div>
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">提交方式</span>
+                        <span class="ai-metric-value">文本 / 文件</span>
+                        <span class="ai-metric-footnote">根据任务内容自动走对应后端处理逻辑</span>
+                    </div>
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">当前状态</span>
+                        <span class="ai-metric-value" id="model-run-status">等待调用</span>
+                        <span class="ai-metric-footnote">点击按钮后返回处理结果并在页面展示</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-grid-two">
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>输入区</h2>
+                            <p class="ai-section-subtitle">支持文本录入与文件上传，点击按钮后由后台统一处理。</p>
+                        </div>
+                    </div>
+                    <form class="model-form" id="model-workbench-form">
+                        {% for field in model_page.fields %}
+                        <label class="model-field">
+                            <span class="model-field-label"><< field.label >></span>
+                            {% if field.type == 'textarea' %}
+                            <textarea
+                                class="model-textarea"
+                                name="<< field.name >>"
+                                placeholder="<< field.placeholder >>"
+                                {% if field.required %}required{% endif %}
+                            ></textarea>
+                            {% elif field.type == 'select' %}
+                            <select class="model-select" name="<< field.name >>" {% if field.required %}required{% endif %}>
+                                {% for option in field.options %}
+                                <option value="<< option.value >>"><< option.label >></option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <input
+                                class="model-input"
+                                type="text"
+                                name="<< field.name >>"
+                                placeholder="<< field.placeholder >>"
+                                {% if field.required %}required{% endif %}
+                            >
+                            {% endif %}
+                            {% if field.help %}
+                            <span class="model-field-help"><< field.help >></span>
+                            {% endif %}
+                        </label>
+                        {% endfor %}
+
+                        <label class="model-field">
+                            <span class="model-field-label">文档上传（可选）</span>
+                            <input class="model-file-input" id="model-file-input" type="file" name="document" accept="<< model_page.accept >>">
+                            <span class="model-field-help">支持文件作为辅助输入；若为二进制文件，当前演示版本会优先结合文件名和手动文本。</span>
+                        </label>
+
+                        <div class="model-submit-row">
+                            <button class="model-submit-button" type="submit" id="model-submit-button"><< model_page.submit_label >></button>
+                            <span class="model-submit-tip">当前结果区会保留在右侧与下方，方便多轮尝试。</span>
+                        </div>
+                    </form>
+                </article>
+
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2><< model_page.result_title >></h2>
+                            <p class="ai-section-subtitle"><< model_page.result_subtitle >></p>
+                        </div>
+                    </div>
+                    <div id="model-summary-panel" class="model-summary-panel">
+                        <div class="ai-empty">提交输入后，这里会展示结果摘要、处理模式和集成说明。</div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="ai-metric-grid" id="model-metric-grid"></section>
+
+            <section class="ai-grid-two">
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>主要结果</h2>
+                            <p class="ai-section-subtitle">根据不同模型类型展示核心结构化结果。</p>
+                        </div>
+                    </div>
+                    <div id="model-primary-panel">
+                        <div class="ai-empty">等待本次模型调用结果。</div>
+                    </div>
+                </article>
+
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>补充说明</h2>
+                            <p class="ai-section-subtitle">用于展示建议、树结构、复核项、块级标签等补充内容。</p>
+                        </div>
+                    </div>
+                    <div id="model-secondary-panel">
+                        <div class="ai-empty">这里会展示补充结果和后续接模说明。</div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="ai-card">
+                <div class="ai-section-head">
+                    <div>
+                        <h2>扩展结果区</h2>
+                        <p class="ai-section-subtitle">用于展示矩阵、阶段路径、复核清单等更长的内容。</p>
+                    </div>
+                </div>
+                <div id="model-tertiary-panel">
+                    <div class="ai-empty">当前还没有更多内容。</div>
+                </div>
+            </section>
+        </main>
+
+        {% set dock_class = 'site-page-dock--ai' %}
+        {% include '_site_page_dock.html' %}
+    </div>
+
+    <script>
+        window.MODEL_WORKBENCH_CONFIG = << model_page_json | safe >>;
+    </script>
+    <script src="<< url_for('static', filename='JS/global/intelligence-common.js') >>"></script>
+    <script src="<< url_for('static', filename='JS/global/model-workbench.js') >>"></script>
+</body>
+
+</html>

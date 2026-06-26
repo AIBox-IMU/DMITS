@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q 矩阵构建</title>
+    <link href="<< url_for('static', filename='CSS/global/intelligence-center.css') >>" rel="stylesheet">
+    <link href="<< url_for('static', filename='CSS/global/site-navigation.css') >>" rel="stylesheet">
+</head>
+
+<body class="ai-page has-site-dock">
+    <div class="ai-shell" id="q-page-root">
+        <header class="ai-topbar">
+            <a class="ai-brand" href="<< url_for('INDEX') >>">
+                <span class="ai-brand-mark">AI</span>
+                <span class="ai-brand-copy">
+                    <span class="ai-brand-kicker">Math System</span>
+                    <span class="ai-brand-title">Q 矩阵构建</span>
+                </span>
+            </a>
+            <div class="ai-topbar-side">
+                <span class="ai-badge is-accent">习题 - 知识点关系构建</span>
+            </div>
+        </header>
+
+        <main class="ai-main">
+            <section class="ai-hero">
+                <div class="ai-hero-copy">
+                    <div class="ai-hero-kicker">Q-Matrix Builder</div>
+                    <h1 class="ai-hero-title">把“习题”和“知识点”之间的关系做成一张可审校、可运营、可继续训练的矩阵</h1>
+                    <p class="ai-hero-desc">
+                        预留热力矩阵、覆盖分析、候选关系审核与规则校验区，直接接入真实 Q 矩阵模型结果。
+                    </p>
+                    <div class="q-legend">
+                        <span><i class="lv0"></i> 无关联</span>
+                        <span><i class="lv1"></i> 弱关联</span>
+                        <span><i class="lv2"></i> 中关联</span>
+                        <span><i class="lv3"></i> 强关联</span>
+                    </div>
+                </div>
+                <div class="ai-hero-side">
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">习题数量</span>
+                        <span class="ai-metric-value" id="q-exercise-count">--</span>
+                        <span class="ai-metric-footnote">进入矩阵计算的题目总量</span>
+                    </div>
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">知识点数量</span>
+                        <span class="ai-metric-value" id="q-knowledge-count">--</span>
+                        <span class="ai-metric-footnote">当前参与构建的知识点数量</span>
+                    </div>
+                    <div class="ai-side-card">
+                        <span class="ai-metric-label">矩阵密度 / 平均关联数</span>
+                        <span class="ai-metric-value"><span id="q-density">--</span> / <span id="q-avg-links">--</span></span>
+                        <span class="ai-metric-footnote">衡量矩阵稀疏度与单题信息量</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-metric-grid" id="q-stats-grid"></section>
+
+            <section class="q-layout">
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>Q 矩阵热力图</h2>
+                            <p class="ai-section-subtitle">主表格直接呈现每道题与每个知识点之间的关联强度。</p>
+                        </div>
+                    </div>
+                    <div class="q-heatmap-wrap">
+                        <table class="q-heatmap">
+                            <thead id="q-heatmap-head"></thead>
+                            <tbody id="q-heatmap-body"></tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>知识点覆盖</h2>
+                            <p class="ai-section-subtitle">快速识别覆盖不足或分布过于集中的知识点。</p>
+                        </div>
+                    </div>
+                    <div class="q-knowledge-list" id="q-knowledge-list"></div>
+                </article>
+            </section>
+
+            <section class="ai-grid-two">
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>候选关系审核</h2>
+                            <p class="ai-section-subtitle">为后续人工确认或教师审核预留高频操作承接区。</p>
+                        </div>
+                    </div>
+                    <div class="q-candidate-list" id="q-candidate-list"></div>
+                </article>
+
+                <article class="ai-card">
+                    <div class="ai-section-head">
+                        <div>
+                            <h2>规则校验</h2>
+                            <p class="ai-section-subtitle">便于在矩阵入库前做基本规则检查，降低异常关系扩散风险。</p>
+                        </div>
+                    </div>
+                    <div class="q-rule-list" id="q-rule-list"></div>
+                </article>
+            </section>
+
+{#            <section class="ai-card">#}
+{#                <div class="ai-section-head">#}
+{#                    <div>#}
+{#                        <h2>接口接入说明</h2>#}
+{#                        <p class="ai-section-subtitle">真实模型结果可以直接映射到当前热力图、候选关系和规则校验区中。</p>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="ai-note-box" id="q-integration-note"></div>#}
+{#            </section>#}
+        </main>
+
+        {% set dock_class = 'site-page-dock--ai' %}
+        {% include '_site_page_dock.html' %}
+    </div>
+
+    <script src="<< url_for('static', filename='JS/global/intelligence-common.js') >>"></script>
+    <script src="<< url_for('static', filename='JS/global/q-matrix.js') >>"></script>
+</body>
+
+</html>

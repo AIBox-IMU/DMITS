@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <title>离散数学知识脉络可视化——首页</title>
+    <link rel="icon" href="../static/Imgs/logo.svg" type="image/x-icon"/>
+    <link rel="stylesheet" href="../static/CSS/gxg-menu.css">
+    <link rel="stylesheet" href="../static/CSS/index.css">
+    <link rel="stylesheet" href="../static/CSS/global/element-plus@1.1.0-index.css">
+    <script src="../static/JS/global/jquery@3.3.1.min.js"></script>
+    <script src="../static/JS/global/jquerySession.js"></script>
+</head>
+<body>
+<a href="#" class="up" title="回到顶部"></a>
+<div id="menu" v-cloak>
+    <gxg-menu index='/index'></gxg-menu>
+</div>
+<div id="main" v-cloak>
+    <div class="header-title">离散数学知识脉络可视化</div>
+    <el-row>
+      <el-col :span="8" v-for="item in menuname">
+        <el-card :body-style="{ padding: '0px' }" shadow="hover">
+          <div style="padding: 14px;">
+            <span>{{ item.name }}</span>
+            <div class="bottom clearfix">
+              <el-link :underline="false" :href="item.link" type="primary" id="link" icon="el-icon-s-promotion">点击前往</el-link>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-tooltip
+            class="item"
+            effect="light"
+            content="切换模式（夜间模式选第一个，白天模式点击恢复）"
+            placement="bottom-end"
+      >
+        <el-row class="background-color-bar">
+                <el-button type="info" icon="el-icon-refresh-left" class="color-back" circle @click="colorback"></el-button>
+                <el-color-picker v-model="color" :predefine="predefineColors" ></el-color-picker>
+        </el-row>
+    </el-tooltip>
+ </div>
+
+<script src="../static/JS/global/vue@3.2.19.js"></script>
+<script src="../static/JS/global/element-plus@1.1.0-index.full.js"></script>
+<script src="../static/JS/gxg-menu.js"></script>
+<script src="../static/JS/index.js"></script>
+</body>
+</html>

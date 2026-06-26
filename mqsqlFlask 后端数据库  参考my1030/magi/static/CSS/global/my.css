@@ -1,0 +1,374 @@
+ /* 限定svg大小 */
+        svg {
+            width: 100%;
+            height: 800px;
+        }
+
+        #graph {
+            position: absolute;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1400px;
+            height:760px;        
+        }
+
+       #searchgraph {
+    position: absolute;
+        top: 0;
+        left: 0;
+        /* width: 50%;
+        height: 100%; */
+    /* top: 0%; */
+        /* left: 50%; */
+        width: 700px;
+        height: 750px;
+        overflow: auto;
+    /* top: 50%;
+    left: 50%;
+    
+    width: 800px;
+    height: 600px; */
+    /* transform: translate(-50%, -50%); */
+}
+
+     #searchgraph2 {
+    position: absolute;
+    /* top: 0%;
+        right: 50%; */
+        
+        top: 0px;
+        right: 0px;
+        /* left:701px; */
+        width: 700px;
+        height: 750px;
+         overflow: auto;
+        /* width: 600px;
+        height: 800px; */
+    /* top: 50%;
+    left: 50%;
+    
+    width: 800px;
+    height: 600px; */
+    /* transform: translate(-50%, -50%); */
+}
+
+  #searchgraph3 {
+    position: absolute;
+    /* top: 0;
+        right: 0;
+        width: 600px;
+        height: 800px; */
+    top: 50%;
+    left: 50%;
+    
+    width: 800px;
+    height: 600px;
+    transform: translate(-50%, -50%);
+}
+
+        /* 图像样式 */
+        .node-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        /* 文本样式 */
+        .node-label {
+            font-size: 7px;
+            text-anchor: middle;
+            fill: azure;
+        
+        }
+
+        /* 边样式 */
+        .link-rect{
+            fill:none;
+        }
+        .link {
+            fill: none;
+            stroke:azure;
+            marker-end: url(#arrowhead);
+        }
+
+        /* 边上的文字样式 */
+        .link-text {
+            display: inline-block;
+            /* width: auto;
+            height: auto; */
+            white-space: nowrap;
+            fill:black;
+            font-size: 6px;
+            /* text-align: center;
+            border-radius: 10px; */
+            /* padding-left: 10px;
+            padding-right: 10px; */
+            font-weight: bold;
+            
+            /* font-size: 12px;
+            fill: azure;
+            font-weight: bold; */
+        }
+        .link-rect{
+            display: inline-block;
+            fill:azure;
+            height: 10px;
+            /* width: 30px; */
+
+        }
+
+        foreignObject {
+            display: none;
+        }
+
+
+
+
+         .circleProgress_wrapper {
+            width:42px;
+            height:42px;
+            /* bottom: 10px; */
+            position:relative;
+            display:inline-block;
+            cursor:pointer
+        }
+
+        .wrapper {
+            width: 100px;
+            height: 200px;
+            position: absolute;
+            top: 0;
+            overflow: hidden;
+        }
+
+        .rightright {
+            right: 0;
+        }
+
+        .left {
+            left: 0;
+        }
+
+        .circleProgress {
+            width:42px;
+            height:42px;
+            bottom:60px;
+            border:2px solid #b0bbc0;
+            border-radius:50%;
+            position:absolute;
+            top:0;
+            /* width: 60px;
+            height: 60px;
+            border: 20px solid rgb(232, 2   32, 12);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            -webkit-transform: rotate(45deg); */
+        }
+
+        .rightcircle {
+            border-top:2px solid #b0bbc0;
+            border-right:2px solid #b0bbc0;
+            right:0;
+            -webkit-animation: circleProgressLoad_right 5s linear infinite;
+            /* border-top: 20px solid green;
+            border-right: 20px solid green;
+            right: 0;
+            -webkit-animation: circleProgressLoad_right 5s linear infinite; */
+        }
+
+        .leftcircle {
+            border-bottom:2px solid #b0bbc0;
+            border-left:2px solid #b0bbc0;
+            left:0;
+            -webkit-animation: circleProgressLoad_left 5s linear infinite;
+            /* border-bottom: 20px solid green;
+            border-left: 20px solid green;
+            left: 0;
+            -webkit-animation: circleProgressLoad_left 5s linear infinite; */
+        }
+
+        @-webkit-keyframes circleProgressLoad_right {
+             0% {
+                border-top: 2px solid #78ffd3;
+                border-right: 2px solid #78ffd3;
+                -webkit-transform: rotate(45deg);
+            }
+
+            50% {
+                border-top: 2px solid #78ffd3;
+                border-right: 2px solid #78ffd3;
+                border-left: 2px solid #78ffd3;
+                border-bottom: 2px solid #78ffd3;
+                -webkit-transform: rotate(225deg);
+            }
+
+            100% {
+                border-left: 2px solid #78ffd3;
+                border-bottom: 2px solid #78ffd3;
+                -webkit-transform: rotate(225deg);
+            }
+        }
+
+        @-webkit-keyframes circleProgressLoad_left {
+           0% {
+                border-bottom: 2px solid #78ffd3;
+                border-left: 2px solid #78ffd3;
+                -webkit-transform: rotate(45deg);
+            }
+
+            50% {
+                border-bottom: 2px solid #78ffd3;
+                border-left: 2px solid #78ffd3;
+                border-top: 2px solid #78ffd3;
+                border-right: 2px solid #78ffd3;
+                -webkit-transform: rotate(225deg);
+            }
+
+            100% {
+                border-top: 2px solid #78ffd3;
+                border-right: 2px solid #78ffd3;
+                border-bottom: 2px solid #78ffd3;
+                border-left: 2px solid #78ffd3;
+                -webkit-transform: rotate(225deg);
+            }
+        }
+
+        /* .focus-circle {
+            width: 120px;
+            ;
+            height: 120px;
+            ;
+            position: absolute;
+            
+            background: url(https://static.allhistory.com/online/view/Relation/img/circle.93e1.png) no-repeat 50%;
+            background-size: contain;
+            pointer-events: none;
+            transform-origin: center;
+            -webkit-animation: rotateCircleShow .5s ease, rotateCircle 5s linear .5s infinite;
+            animation: rotateCircleShow .5s ease, rotateCircle 5s linear .5s infinite
+        }
+
+        @-webkit-keyframes rotateCircleShow {
+            0% {
+                opacity: 0;
+                transform: scale3d(1.5, 1.5, 1)
+            }
+
+            to {
+                opacity: 1;
+                transform: scaleX(1)
+            }
+        }
+
+        @keyframes rotateCircleShow {
+            0% {
+                opacity: 0;
+                transform: scale3d(1.5, 1.5, 1)
+            }
+
+            to {
+                opacity: 1;
+                transform: scaleX(1)
+            }
+        }
+
+        @-webkit-keyframes rotateCircle {
+            0% {
+                transform: rotate(0)
+            }
+
+            to {
+                transform: rotate(1turn)
+            }
+        }
+
+        @keyframes rotateCircle {
+            0% {
+                transform: rotate(0)
+            }
+
+            to {
+                transform: rotate(1turn)
+            } */
+        /* } */
+
+        /* .relation-control-panel .video-auto-play .circleProgress_wrapper .wrapper{
+    width:21px;
+    height:42px;
+    position:absolute;
+    top:0;
+    overflow:hidden;
+    display:none
+}
+.relation-control-panel .video-auto-play .circleProgress_wrapper .wrapper .circleProgress{
+    width:42px;
+    height:42px;
+    border:2px solid #78ffd3;
+    border-radius:50%;
+    position:absolute;
+    top:0;
+    /* transform:rotate(45deg) */
+     /* -webkit-transform: rotate(45deg); */
+/* } */
+/* .relation-control-panel .video-auto-play .circleProgress_wrapper .wrapper .rightcircle{
+    border-top:2px solid #b0bbc0;
+    border-right:2px solid #b0bbc0;
+    right:0;
+    -webkit-animation: circleProgressLoad_right 5s linear 1;
+}
+.relation-control-panel .video-auto-play .circleProgress_wrapper .wrapper .leftcircle{
+    border-bottom:2px solid #b0bbc0;
+    border-left:2px solid #b0bbc0;
+    left:0;
+    -webkit-animation: circleProgressLoad_left 5s linear 1;
+}
+
+ @-webkit-keyframes circleProgressLoad_right {
+            0% {
+                border-top: 2px solid #78ffd3;
+                border-right: 2px solid #78ffd3;
+                -webkit-transform: rotate(45deg);
+            }
+
+            50% {
+                border-top: 2px solid #78ffd3;
+                border-right: 2px solid #78ffd3;
+                border-left: 2px solid #78ffd3;
+                border-bottom: 2px solid #78ffd3;
+                -webkit-transform: rotate(225deg);
+            }
+
+            100% {
+                border-left: 2px solid #78ffd3;
+                border-bottom: 2px solid #78ffd3;
+                -webkit-transform: rotate(225deg);
+            }
+        }
+    }
+
+@-webkit-keyframes circleProgressLoad_left {
+            0% {
+                border-bottom: 2px solid #78ffd3;
+                border-left: 2px solid #78ffd3;
+                -webkit-transform: rotate(45deg);
+            }
+
+            50% {
+                border-bottom: 2px solid #78ffd3;
+                border-left: 2px solid #78ffd3;
+                border-top: 2px solid #78ffd3;
+                border-right: 2px solid #78ffd3;
+                -webkit-transform: rotate(45deg);
+            }
+
+            100% {
+                border-top: 2px solid #78ffd3;
+                border-right: 2px solid #78ffd3;
+                border-bottom: 2px solid #78ffd3;
+                border-left: 2px solid #78ffd3;
+                -webkit-transform: rotate(225deg);
+            }
+} */ 

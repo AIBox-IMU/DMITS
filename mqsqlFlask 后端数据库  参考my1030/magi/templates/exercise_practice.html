@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>习题练习</title>
+    <link href="<< url_for('static', filename='CSS/global/exercise-practice.css') >>" rel="stylesheet">
+</head>
+
+<body>
+    <div class="practice-page">
+        <header class="practice-header">
+            <div class="practice-header-main">
+                <div class="practice-kicker">习题练习区域</div>
+                <h1 id="practice-node-title">正在加载知识点...</h1>
+                <p id="practice-node-summary" class="practice-header-summary">正在同步题目与资源信息，请稍候。</p>
+            </div>
+            <div class="practice-header-actions">
+                <a class="practice-link-button practice-link-muted" href="<< url_for('knowledge_graph_page') >>">返回知识图谱</a>
+                <button type="button" class="practice-link-button" id="show-answer-btn">显示正确答案</button>
+            </div>
+        </header>
+
+        <main class="practice-layout">
+            <section class="practice-main-column">
+                <article class="practice-card">
+                    <div class="practice-card-head">
+                        <span class="practice-card-kicker">当前习题</span>
+                        <div id="exercise-meta" class="practice-meta-row"></div>
+                    </div>
+                    <h2 id="exercise-title" class="practice-card-title">正在加载题目...</h2>
+                    <div id="exercise-question" class="practice-question-body"></div>
+                    <div id="exercise-options" class="practice-options-wrap"></div>
+                </article>
+
+                <article class="practice-card">
+                    <div class="practice-card-head">
+                        <span class="practice-card-kicker">作答区</span>
+                        <div class="practice-submit-actions">
+                            <button type="button" class="practice-primary-btn" id="submit-answer-btn">提交评分</button>
+                        </div>
+                    </div>
+                    <div id="answer-input-container" class="practice-answer-wrap"></div>
+                </article>
+
+                <article class="practice-card practice-result-card is-hidden" id="score-result-card">
+                    <div class="practice-card-head">
+                        <span class="practice-card-kicker">智能评分结果</span>
+                        <div class="practice-score-badge" id="score-result-badge"></div>
+                    </div>
+                    <p id="score-result-feedback" class="practice-result-feedback"></p>
+                    <div class="practice-result-columns">
+                        <section>
+                            <h3>优点</h3>
+                            <ul id="score-strength-list" class="practice-bullet-list"></ul>
+                        </section>
+                        <section>
+                            <h3>改进建议</h3>
+                            <ul id="score-improvement-list" class="practice-bullet-list"></ul>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="practice-card practice-answer-card is-hidden" id="correct-answer-card">
+                    <div class="practice-card-head">
+                        <span class="practice-card-kicker">参考答案</span>
+                    </div>
+                    <section class="practice-answer-section">
+                        <h3>正确答案</h3>
+                        <div id="correct-answer-content" class="practice-answer-content"></div>
+                    </section>
+                    <section class="practice-answer-section">
+                        <h3>解析</h3>
+                        <div id="correct-analysis-content" class="practice-answer-content"></div>
+                    </section>
+                </article>
+            </section>
+
+            <aside class="practice-side-column">
+                <article class="practice-card">
+                    <div class="practice-card-head">
+                        <span class="practice-card-kicker">知识点信息</span>
+                    </div>
+                    <div id="node-meta-pills" class="practice-meta-row"></div>
+                    <div id="node-goals" class="practice-node-block"></div>
+                    <div id="node-path" class="practice-node-block"></div>
+                </article>
+
+                <article class="practice-card">
+                    <div class="practice-card-head">
+                        <span class="practice-card-kicker">同知识点下其他习题</span>
+                        <span id="exercise-count-pill" class="practice-count-pill"></span>
+                    </div>
+                    <div id="exercise-list" class="practice-exercise-list"></div>
+                </article>
+            </aside>
+        </main>
+
+        <div id="practice-toast" class="practice-toast is-hidden"></div>
+    </div>
+
+    <script>
+        window.__PRACTICE_CONTEXT__ = {
+            nodeId: "<< node_id >>",
+            exerciseId: "<< exercise_id >>"
+        };
+    </script>
+    <script src="<< url_for('static', filename='JS/global/exercise-practice.js') >>"></script>
+</body>
+
+</html>
